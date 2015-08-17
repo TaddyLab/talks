@@ -64,14 +64,7 @@ Matt Taddy,  Chicago Booth
 
 {\bf Big Data}
 
-
-\vskip .5cm
-{\nv The data are super weird.  }
-\begin{itemize}
-\item Internet transaction data distributions have a big spike at zero and spikes at other discrete values (e.g., 1 or \$99).
-\item Big tails (e.g., \$12 mil/month eBay user spend) that matter.
-\item We cannot  write down believable models.
-\end{itemize}
+\vskip .25cm
 
 \vskip .25cm
 {\nv The sample sizes are enormous.}
@@ -79,6 +72,16 @@ Matt Taddy,  Chicago Booth
 \item we'll see 21 and 200 million today.  
 \item Data can't fit in memory, or even storage, on a single machine.
 \item Our familiar MCMC algorithms take too long.
+\end{itemize}
+
+
+\vskip .25cm
+{\nv The data are super weird.  }
+\begin{itemize}
+\item Internet transaction data distributions have a big spike at zero and spikes at other discrete values (e.g., 1 or \$99).
+\item Big tails (e.g., \$12 mil/month eBay user spend) that matter.
+\item {\theme The dimension of the feature space is enormous.}
+\item We cannot  write down or measure believable models.
 \end{itemize}
 
 \end{frame}
@@ -116,8 +119,8 @@ This is classical `distribution free' nonparametrics.
 \vskip .5cm
 Practitioners apply the simple stat and feel happy that it will work.
 
-\vskip .2cm
-No need to re-model the underlying DGP each time, and you \\don't need to have a PhD in Bayesian Statistics to apply the ideas.
+% \vskip .2cm
+% No need to re-model the underlying DGP each time, and you \\don't need to have a PhD in Bayesian Statistics to apply the ideas.
 
 \vskip .5cm\hfill
 {\theme Can we Bayesians provide something like this?}
@@ -129,11 +132,12 @@ No need to re-model the underlying DGP each time, and you \\don't need to have a
 {\bf distribution free Bayesian nonparametrics}
 
 \vskip .5cm
-{Find some {\it statistic of the DGP} that you care about.}
+{Find some {\it statistic of the DGP} that you care about:}
 \vskip .1cm
 \begin{itemize}
-\item Derive it from first principles, e.g. moment conditions.
-\item Or a statistic could be an algorithm that we know works.
+\item derive from first principles, e.g. moment conditions
+\item {\it an algorithm} that we know works, e.g. CART
+\item think about geometric projections, e.g. OLS
 \end{itemize}
 \vskip .1cm
 Call this statistic $\bs{\theta}(g)$ where $g(\bm{z})$ is the DGP (e.g., for $\bm{z} = [\bm{x},y]$).
@@ -247,74 +251,73 @@ This is the familiar Huber-White `Sandwich' variance formula.
 \vskip .5cm
 Every experiment has response $y$ and treatment $d$ {\gr [0/1]}.
 
-\vskip .5cm
-We know $\bm{x}_i$ about user $i$.
+\vskip .05cm
+In our illustrative example,
+$d_i = 1$ for bigger pictures in my eBay.
 
-\vskip .2cm
-\begin{itemize}
-\item Their previous spend, items bought, items sold...
-\item Page view counts, items watched, searches, ...
-\item All of the above, broken out by product, fixed v. auction, ...
-\end{itemize}
 
 \vskip .25cm
-$\bm{x}_i$ are  possible sources of heterogeneity. About 400 in our example.
+{\small $i\in{\sf c}: d_i=0$ \hspace{3.5cm} $i\in{\sf t}: d_i=1$}
 
+\includegraphics[scale=.5]{graphs/pottersmall}
+\includegraphics[scale=.5]{graphs/potterbig}
+
+
+\vskip .5cm
+This is a typical `A/B experiment'.
 \end{frame}
 
 \begin{frame}
 
 What is `heterogeneity in treatment effects'? {\gr(HTE)}
 
-\vskip .5cm Different units {\gr [people, devices]} respond differently to some treatment you apply {\gr [change to website, marketing, policy]}.  
+\vskip .2cm Different units {\gr [people, devices]} respond differently to some treatment you apply {\gr [change to website, marketing, policy]}.  
 
-\vskip .5cm I imagine it exists.  
+\vskip .2cm {\theme I imagine it exists.  }
 
-\vskip .5cm Can we accurately measure heterogeneity: index it on $\bm{x}$?
+\vskip .5cm
+We know $\bm{x}_i$ about user $i$. {\gr About 400 features in our example.}
 
-\end{frame}
+\vskip .1cm
+\begin{itemize}
+\item Their previous spend, items bought, items sold...
+\item Page view counts, items watched, searches, ...
+\item All of the above, broken out by product, fixed v. auction, ...
+\end{itemize}
 
-
-\begin{frame}
-
-In our illustrative example,
-$d_i$ = bigger pictures in my eBay.
-
-\vskip .25cm
-\includegraphics[width=4.5in]{graphs/userex}
-
-21 million tracked visitors over 5 weeks, 2/3 in treatment.
-\vskip -.5cm
+\vskip .1cm Can we accurately measure heterogeneity: index it on $\bm{x}$?
 
 \end{frame}
 
 
+
 \begin{frame}
 
-{\theme a statistic we care about ...}
+{\bf {\gr Example:} an HTE statistic that we care about.}
 
 \vskip .25cm
-Potential outcome: $\upsilon_{i}({\sf d})$ is $\approx$ \$ for user
-$i$ under  ${\sf d}$.  
+Potential outcomes:
+\begin{itemize}
+\item $\upsilon_{i}(d)$ is the response for user
+$i$ if $d_i = d$.  
+\item The {\it treatment effect} is $\upsilon_{i}(1)- \upsilon_{i}(0)$
+\item
+We only observe one of $\upsilon_{i}(1)$ and $\upsilon_{i}(0)$: `$y$'.
+\end{itemize}
 
-\vskip .05cm
-We only ever get to see one of $\upsilon_{i}({\sf t})$ and $\upsilon_{i}({\sf c})$: `y'.
-
-\vskip .25cm
-We care about `$\bs{\gamma}$' from the {\it moment condition}
+\vskip .5cm
+We'd love to solve for `$\bs{\gamma}$' from the {\it moment condition}
 \[
 \ds{E}\left[\bm{x}(\upsilon({\sf t}) - \upsilon({\sf c})-\bm{x}'\bs{\gamma})\right] = \bs{0} 
 \]
-This says $\bm{x}'\bs{\gamma}$ is uncorrelated with the treatment effect $\upsilon({\sf t}) - \upsilon({\sf c})$.
-
-\vskip .25cm
-Since randomization implies that $\ds{E}[\bm{x}\upsilon({\sf d})] = \ds{E}[\bm{x}\upsilon({\sf d}) | d]$, we get
+But randomization implies $\ds{E}[\bm{x}\upsilon(d)] = \ds{E}[\bm{x}\upsilon(d) | d]$, so:
 \[
 \bs{\gamma} = 
 \ds{E}\left[\bm{x}\bm{x}'\right]^{-1}
-\bigg(\ds{E}[\bm{x}y | {\sf d} = {\sf t}] - \ds{E}[\bm{x}y|  {\sf d} = {\sf c}]\bigg)
+\bigg(\ds{E}[\bm{x}y |d=1] - \ds{E}[\bm{x}y|  d=0]\bigg)
 \]
-
+\hfill 
+{\gr This is a sort of OLS projection for treatment effects.}
 \end{frame}
 
 
@@ -375,7 +378,7 @@ e.g., coefficient on purchase within last-year vs an intercept:
 Trees are great: nonlinearity, deep interactions, heteroskedasticity.
 
 \begin{center}
-\includegraphics[width=4in]{../graphs/umbrella}
+\includegraphics[width=4in]{graphs/umbrella}
 \end{center}
 
 The `optimal' decision tree is a statistic we care about {\gr (s.w.c.a)}.
@@ -422,8 +425,8 @@ For $b=1 \dots B$: \\
  
 \vskip .5cm\small 
 ~~~~~~~~~~~~~~~~~~~~~{\it one tree~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~posterior mean}\\
-\includegraphics[height=1.75in]{../../bayesian-forest/graphs/MCtreedraw}   
-\includegraphics[height=1.75in]{../../bayesian-forest/graphs/MCbforest}   
+\includegraphics[height=1.75in]{graphs/MCtreedraw}   
+\includegraphics[height=1.75in]{graphs/MCbforest}   
 
 \vskip .25cm{
 Random Forest $\approx$ Bayesian forest $\approx$ posterior over CART fits.}
@@ -521,16 +524,17 @@ $\Rightarrow$ easy scalable uncertainty quantification for complex algorithms.
 
 Decouple  action/prediction from the full generative process model.
 
-\vskip .5cm
-A weakness: as dimension of the target statistics grow, the BB observed $\approx$ population support substitution becomes less realistic.
+% \vskip .5cm
+% A weakness: as dimension of the target statistics grow, the BB observed $\approx$ population support substitution becomes less realistic.
 
 \vskip .5cm
-{\theme topologists can help!} 
+{\nv topologists can make a big impact:} 
 \begin{itemize}
 \item we need to map from high-D data to low-D shapes.
 \item we need tractable approximations to low-D structures. 
 \end{itemize}
 
+\vfill \hfill {\Huge \bf \theme thanks!}
 
 \end{frame}
 
