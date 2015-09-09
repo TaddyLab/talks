@@ -10,7 +10,6 @@
 \setbeamertemplate{footline}{
    \raisebox{5pt}{\makebox[\paperwidth]{\hfill\makebox[20pt]{\color{gray}\scriptsize\insertframenumber}}}}
 
-\graphicspath{{/Users/mtaddy/Dropbox/inputs/}}
 \usepackage{algorithm}
 \usepackage{algorithmic}
 
@@ -45,8 +44,9 @@
 \begin{frame}[plain]
 \begin{center}
 
+{\bf \LARGE \theme }
 
-{\bf \Large Big Data and Bayesian Nonparametrics}
+{\bf \Large  Big Data and Bayesian Nonparametrics}
 
 \vskip 2cm
 Matt Taddy,  Chicago Booth
@@ -58,18 +58,36 @@ Matt Taddy,  Chicago Booth
 \end{center}
 \end{frame} }
 
-\begin{frame}
 
+\begin{frame}
 
 {\bf Big Data}
 
-\vskip .5cm
-{The sample sizes are enormous. {\gr 200\texttt{+} million obs}}
-
-{The data are super weird.  {\gr density spikes, obese tails}}
+\vskip .25cm
 
 \vskip .25cm
-`Big' and `Strange' beg for nonparametrics.
+{\nv The sample sizes are enormous.}
+\begin{itemize}
+\item we'll see 21 and 200 million today.  
+\item Data can't fit in memory, or even storage, on a single machine.
+\item Our familiar MCMC algorithms take too long.
+\end{itemize}
+
+
+\vskip .25cm
+{\nv The data are super weird.  }
+\begin{itemize}
+\item Internet transaction data distributions have a big spike at zero and spikes at other discrete values (e.g., 1 or \$99).
+\item Big tails (e.g., \$12 mil/month eBay user spend) that matter.
+\item The dimension of the feature space is enormous.
+\item We cannot  write down or measure believable models.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+Both `Big' and `Strange' beg for nonparametrics.
 
 \vskip .5cm
 In usual BNP you {\it model} a complex generative process with flexible priors, then apply that model directly in prediction and inference.
@@ -80,7 +98,6 @@ However averaging over all of the nuisance parameters we introduce to be `flexib
 
 \vskip .5cm
 \hfill {\theme Can we do scalable BNP?}
-
 \end{frame}
 
 \begin{frame}
@@ -101,10 +118,31 @@ This is classical `distribution free' nonparametrics.
 \vskip .5cm
 Practitioners apply the simple stat and feel happy that it will work.
 
-% {\gr No need to re-model the underlying DGP each time, and you \\don't need to have a PhD in Bayesian Statistics to apply the ideas.}
+% \vskip .2cm
+% No need to re-model the underlying DGP each time, and you \\don't need to have a PhD in Bayesian Statistics to apply the ideas.
 
-\vskip .5cm\hfill
-{\theme Can we Bayesians provide something like this?}
+% \vskip .5cm\hfill
+% {\theme Can we Bayesians provide something like this?}
+
+\end{frame}
+
+\begin{frame}
+
+{\bf distribution free Bayesian nonparametrics}
+
+\vskip .5cm
+{Find some {\it statistic of the DGP} that you care about:}
+\vskip .1cm
+\begin{itemize}
+\item derive from first principles, e.g. moment conditions
+\item {\it an algorithm} that we know works, e.g. CART
+\item think about geometric projections, e.g. OLS
+\end{itemize}
+\vskip .1cm
+Call this statistic $\bs{\theta}(g)$ where $g(\bm{z})$ is the DGP (e.g., for $\bm{z} = [\bm{x},y]$).
+
+\vskip .5cm
+Then you write down a flexible  model for the DGP $g$, and study properties of the posterior on $\bs{\theta}(g)$ induced by the posterior over $g$.
 
 \end{frame}
 
@@ -145,28 +183,72 @@ $a \to 0$ leads to $\mr{p}(\theta_l = 0) = 1$ for $\bs{\zeta}_l \notin \bm{Z}$.
 where $\bs{\Theta} = \mr{diag}(\bs{\theta})$.  
 {\theme This is a random variable. \gr (sample via BB)}
 
+\vskip .75cm
+\includegraphics[width=\textwidth]{graphs/ozone}
+\end{frame}
+
+% \begin{frame}[fragile]
+
+% {\footnotesize\gr
+% \begin{verbatim}
+% data(airquality); n <- nrow(airquality)
+% B <- 1000; beta <- vector(length=B)
+% for(b in 1:B){
+%   fit <- lm(Ozone ~., data=airquality, weights=rexp(n))
+%   beta[b] <- coef(fit)["Wind"] }
+% sampfit <- lm(Ozone ~ ., data=airquality)
+% coef <- summary(sampfit)$coef["Wind",1:2]
+% x <- as.matrix(cbind(1,na.omit(airquality)[,-1]))
+% xxi <- solve(crossprod(x))
+% sandwich <- xxi%*%t(x)%*%diag(sampfit$resid^2)%*%x%*%xxi
+% hist(beta, col=8, main="", 
+%   xlab="Coefficient for Ozone on Wind", 
+%   freq=FALSE,ylim=c(0,0.6),breaks=25)
+% grid <- seq(-6,5,length=500)
+% lines(grid, dnorm(grid,coef[1],coef[2]),col=2,lwd=2)
+% lines(grid, dnorm(grid,coef[1],sqrt(sandwich[3,3])),col=4,lwd=2)
+% legend("topleft",col=c(8,2),lwd=4, 
+%   legend=c("bootstrap BNP posterior",
+%            "normal approx BNP posterior",
+%            "standard sampling distribution"),bty="n")
+% \end{verbatim}
+% }
+
+% \end{frame}
+
+\begin{frame}
+
+{\nv \bf What is the blue line? } \\BB sampling is great, but analytic approximations are also useful.
+
 \vskip .5cm
-Posterior moments for a first-order approx
+Consider a first-order Taylor series approximation,
 \[
 \bs{\tilde \beta} = [\bm{X}'\bm{X}]^{-1}\bm{X}'y + 
 \nabla \bs{\beta}\big |_{\bs{\theta}=\bm{1}} (\bs{\theta} - \bm{1})
 \]
+
+We can derive {\it exact} posterior moments for $\bs{\tilde \beta}$ under $\theta_i \stackrel{iid}{\sim}\mathrm{Exp}(1)$.
+
+\vskip .25cm
 e.g., $\mr{var}(\bs{\tilde \beta}) \approx (\bm{X}^{\prime}\bm{X})^{-1}\bm{X}^{\prime}\mr{diag}(\bm{e})^2\bm{X}^{\prime}(\bm{X}^{\prime}\bm{X})^{-1}$, where $e_i  = y_i - \bm{x}_i'\bs{\hat\beta}$.
 
-\vskip .5cm{\gr \hfill
+\vskip .25cm
+This is the familiar Huber-White `Sandwich' variance formula.
+
+\vskip .25cm{\gr \hfill
  See Lancaster 2003 or Poirier 2011.}
 
 \end{frame}
 
 \begin{frame}
 
-{\bf User-Specific Behavior in Experiments}
+{\bf{\gr Example:} User-Specific Behavior in Experiments}
 
 \vskip .5cm
-{eBay runs lots of experiments:} they make changes to the marketplace (website) for random samples of users.
+{\nv eBay runs lots of experiments:} they make changes to the marketplace (website) for random samples of users.
 
-\vskip .25cm
-Every experiment has response $y$ {\gr (spend)} and treatment $d$ {\gr [0/1]}.
+\vskip .5cm
+Every experiment has response $y$ and treatment $d$ {\gr [0/1]}.
 
 \vskip .05cm
 In our illustrative example,
@@ -181,22 +263,96 @@ $d_i = 1$ for bigger pictures in my eBay.
 
 
 \vskip .5cm
-We know $\bm{x}_i$ about user $i$: {\gr previous spend, last purchase date, items bought, sold, watched, bidded on, pages visited,  ...}
-
-And every user responds diferently to the treatment.
+This is a typical `A/B experiment'.
 \end{frame}
 
 \begin{frame}
 
+What is `heterogeneity in treatment effects'? {\gr(HTE)}
+
+\vskip .2cm Different units {\gr [people, devices]} respond differently to some treatment you apply {\gr [change to website, marketing, policy]}.  
+
+\vskip .2cm {\theme I imagine it exists.  }
+
+\vskip .5cm
+We know $\bm{x}_i$ about user $i$. {\gr About 400 features in our example.}
+
+\vskip .1cm
+\begin{itemize}
+\item Their previous spend, items bought, items sold...
+\item Page view counts, items watched, searches, ...
+\item All of the above, broken out by product, fixed v. auction, ...
+\end{itemize}
+
+\vskip .1cm Can we accurately measure heterogeneity: index it on $\bm{x}$?
+
+\end{frame}
 
 
-We can {\it index}  heterogeneity in treatment effect on $\bm{x}_i$ via
+
+\begin{frame}
+
+{\bf {\gr Example:} an HTE statistic that we care about.}
+
+\vskip .25cm
+Potential outcomes:
+\begin{itemize}
+\item $\upsilon_{i}(d)$ is the response for user
+$i$ if $d_i = d$.  
+\item The {\it treatment effect} is $\upsilon_{i}(1)- \upsilon_{i}(0)$
+\item
+We only observe one of $\upsilon_{i}(1)$ and $\upsilon_{i}(0)$: `$y$'.
+\end{itemize}
+
+\vskip .5cm
+We'd love to solve for `$\bs{\gamma}$' from the {\it moment condition}
 \[
-\bs{\beta}_{\sf t} - \bs{\beta}_{\sf c} = (\bm{X}_{\sf t}'\bs{\Theta}_{\sf t}\bm{X}_{\sf t})^{-1}  \bm{X}_{\sf t}'\bs{\Theta}_{\sf t}\bm{y}_{\sf t} - (\bm{X}_{\sf c}'\bs{\Theta}_{\sf c}\bm{X}_{\sf c})^{-1}  \bm{X}_{\sf c}'\bs{\Theta}_{\sf c}\bm{y}_{\sf c} 
+\ds{E}\left[\bm{x}(\upsilon({\sf t}) - \upsilon({\sf c})-\bm{x}'\bs{\gamma})\right] = \bs{0} 
+\]
+But randomization implies $\ds{E}[\bm{x}\upsilon(d)] = \ds{E}[\bm{x}\upsilon(d) | d]$, so:
+\[
+\bs{\gamma} = 
+\ds{E}\left[\bm{x}\bm{x}'\right]^{-1}
+\bigg(\ds{E}[\bm{x}y |d=1] - \ds{E}[\bm{x}y|  d=0]\bigg)
+\]
+\hfill 
+{\gr This is a sort of OLS projection for treatment effects.}
+\end{frame}
+
+
+\begin{frame}
+
+As we did with OLS, consider a first-order approximation
+\begin{equation*}
+\bs{\tilde \gamma} = \bs{\hat \gamma} + 
+\nabla \bs{\gamma}\big|_{\bs{\theta}=\bm{1}} (\bs{\theta} - \bm{1}).
+\end{equation*}
+where
+\[
+\bs{\hat \gamma} = \bs{\gamma}\big|_{\bs{\theta}=\bm{1}} = n(\bm{X}'\bm{X})^{-1}
+ \left(\frac{\bm{X}_{\sf t}'\bm{y}_{\sf t}}{n_{\sf t}} - 
+ \frac{\bm{X}_{\sf c}'\bm{y}_{\sf c}}{n_{\sf c}}\right).
+\]
+
+This yields an approximate variance
+\[
+\mathrm{var}(\bs{\tilde\gamma}) \approx (\bm{X}'\bm{X})^{-1}\bm{X}'
+\mathrm{diag}(\bs{e}^\star)
+\bm{X}(\bm{X}'\bm{X})^{-1}
+\]
+with `treatment effect residuals' 
+\[
+ e^\star_i = \left( \frac{\ds{1}_{[i\in {\sf t}]}}{n_{\sf t}} - \frac{\ds{1}_{[i\in {\sf c}]}}{n_{\sf c}}\right)ny_i -\bm{x}_i'\bs{\hat\gamma}.
 \] 
+
+\gr \hfill Or you can bootstrap, but it takes a long time.
+\end{frame}
+
+\begin{frame}
 
 e.g., coefficient on purchase within last-year vs an intercept:
 
+\vskip .25cm
 {\footnotesize\it
 \gr million users:~~~~~~~~~~~~~~~7.45~~~~~~~~~~~~~~~~~~~~~~10.97~~~~~~~~~~~~~~~~~~~~~13.22}
 \begin{center}
@@ -204,7 +360,7 @@ e.g., coefficient on purchase within last-year vs an intercept:
 \includegraphics[width=.9\textwidth]{graphs/gammapost}
 \end{center}
 
-\vskip -.5cm
+\vskip .25cm
 {\gr Sample is from posterior, contours are normal approximation.}
 
 {This is a statistic we care about}, even if the truth is nonlinear.
@@ -215,7 +371,7 @@ e.g., coefficient on purchase within last-year vs an intercept:
 \begin{frame}
 
 
-{\bf {\theme Example:} Decision Trees}
+{\bf {\gr Example:} Decision Trees}
 
 \vskip .5cm
 Trees are great: nonlinearity, deep interactions, heteroskedasticity.
@@ -491,9 +647,11 @@ Putting it into production requires some careful engineering, \\but this really 
 
 \end{frame}
 
+
 \begin{frame}
 
-{\bf Heterogeneous Treatment Effects}
+{ \bf {\theme Back to HTE:}  Treatment Effect Trees}
+
 
 \vskip .5cm
 Recall our earlier example: A/B experiment with user covariates $\bm{x}_i$.
@@ -573,10 +731,11 @@ $\Rightarrow$ easy scalable uncertainty quantification for complex algorithms.
 
 \end{frame}
 
+
 \begin{frame}
 
 \vskip .5cm
-{\bf Big Data and distribution free BNP}
+{\bf Big Data and distribution-free BNP}
 
 \vskip .25cm I think about BNP as a way to analyze (and improve) algorithms.  
 
@@ -595,8 +754,6 @@ Once we figure this out,  we can use a little bit of the data to\\ learn the eas
 \hfill \huge \theme \bf thanks!
 
 \end{frame}
-
-
 
 
 
