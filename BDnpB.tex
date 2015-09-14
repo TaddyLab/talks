@@ -70,7 +70,7 @@ Matt Taddy,  Chicago Booth
 \begin{itemize}
 \item we'll see 21 and 200 million today.  
 \item Data can't fit in memory, or even storage, on a single machine.
-\item Our familiar MCMC algorithms take too long.
+%\item Our familiar MCMC algorithms take too long.
 \end{itemize}
 
 
@@ -79,35 +79,50 @@ Matt Taddy,  Chicago Booth
 \begin{itemize}
 \item Internet transaction data distributions have a big spike at zero and spikes at other discrete values (e.g., 1 or \$99).
 \item Big tails (e.g., \$12 mil/month eBay user spend) that matter.
-\item The dimension of the feature space is enormous.
+\item The potential feature space is enourmous.
 \item We cannot  write down or measure believable models.
 \end{itemize}
 
+\vskip .5cm\theme
+Both `Big' and `Strange' beg for nonparametrics.
+
 \end{frame}
 
 \begin{frame}
 
-Both `Big' and `Strange' beg for nonparametrics.
+{\bf Bayesian nonparametrics}
 
 \vskip .5cm
 In usual BNP you {\it model} a complex generative process with flexible priors, then apply that model directly in prediction and inference.
-\[
-\text{e.g.,~~~}y = f(\bm{x}) + \epsilon,~~\text{or~even~just}~~f(y|\bm{x})
-\]
-However averaging over all of the nuisance parameters we introduce to be `flexible' is a hard computational problem.
 
-\vskip .5cm
-\hfill {\theme Can we do scalable BNP?}
+\vskip .25cm
+~~~~~~~e.g.,~~~~ $y = f(\bm{x}) + \varepsilon$ ~~~%{\gr additive error semiparametric regression.}
+or ~~~ $f(y|\bm{x}) = f(\bm{x},y)/f(\bm{x})$ %{\gr implied conditionals / kernel regression}
+
+\vskip .25cm
+`Flexibility' comes from a huge number of variables,
+\[
+\text{e.g.,}~~~~~ f(\bm{z}) = \sum_{k=1}^{{\theme \infty}} \omega_k \mr{N}(\bm{z};~\bs{\mu}_k,\bs{\Sigma}_k),
+\]
+and learning requires integration over uncertainty on nuisance parameters, e.g., $k_i$  component membership for observation $\bm{z}_i$.
+
+\vskip .5cm 
+For years this integration was done via MCMC. But these algorithms did not scale for big data.   {\theme Can we do scalable BNP?}
+
+
 \end{frame}
 
 \begin{frame}
 
-Frequentists are great at finding simple procedures {\gr\small (e.g. $[\bm{X}'\bm{X}]^{-1}\bm{X}'y$)\!} and  showing that they will `work' regardless of the true DGP.
-
-\hfill{\gr \small (DGP = Data Generating Process)~~~~~~~}
+{\bf Classical distribution-free nonparametrics}
 
 \vskip .5cm
-This is classical `distribution free' nonparametrics.
+Frequentists are great at finding simple procedures {\gr\small (e.g. $[\bm{X}'\bm{X}]^{-1}\bm{X}'y$)\!\!} and  describing how they work under a variety of possible true DGP.
+
+\hfill{\nv (~DGP = Data Generating Process~)}
+
+\vskip .5cm
+This is `distribution free' nonparametrics.
 
 \vskip .15cm
 1: Find some statistic that is useful regardless of DGP.
@@ -119,16 +134,13 @@ This is classical `distribution free' nonparametrics.
 Practitioners apply the simple stat and feel happy that it will work.
 
 % \vskip .2cm
-% No need to re-model the underlying DGP each time, and you \\don't need to have a PhD in Bayesian Statistics to apply the ideas.
-
-% \vskip .5cm\hfill
-% {\theme Can we Bayesians provide something like this?}
+% No need to re-model the underlying DGP each time, and you \\don't need to have a PhD in  Statistics to apply the ideas.
 
 \end{frame}
 
 \begin{frame}
 
-{\bf distribution free Bayesian nonparametrics}
+{\bf Distribution-free Bayesian nonparametrics}
 
 \vskip .5cm
 {Find some {\it statistic of the DGP} that you care about:}
@@ -149,25 +161,50 @@ Then you write down a flexible  model for the DGP $g$, and study properties of t
 \begin{frame}
 
 {\bf A flexible model for the DGP}
-\begin{equation*}
-g(\bm{z}) = \frac{1}{|\bs{\theta}|}\sum_{l=1}^L \theta_l \ds{1}{[\bm{z} =
-\bs{\zeta}_l]}, ~~~ \theta_l/|\bs{\theta}| \stackrel{iid}{\sim} \mr{Dir}(a)\end{equation*}
-
-\vskip .25cm
-After observing $\bm{Z} = \{\bm{z}_1 \ldots \bm{z}_n\}$, posterior has $\theta_l \sim \mr{Exp}(a\!+\!\ds{1}_{\bs{\zeta}_l \in \bm{Z}})$. {\gr (say every $\bm{z}_i = [\bm{x}_i,y_i]$ is unique)}.
 
 \vskip .5cm
+Say $\bm{z} = [\bm{x},y]$ is a single {\it independent} data point.
+
+\vskip .25cm Each data point assumes one of a {\it finite} number of possible values, $[\bs{\zeta}_1 \ldots \bs{\zeta}_L]$, with probabilities proportional to $[\bs{\theta}_1 \ldots \bs{\theta}_L]$.
+\begin{equation*}
+g(\bm{z}) = \frac{1}{|\bs{\theta}|}\sum_{l=1}^L \theta_l \ds{1}_{[\bm{z} =
+\bs{\zeta}_l]}\end{equation*}
+
+We complete specification with a conjugate prior on the weights:
+\[\frac{\bs{\theta}}{|\bs{\theta}|} \sim \mr{Dir}(a) \propto \frac{1}{|\bs{\theta}|^{L(a-1)}}\prod_l \theta_l^{a-1}~~\text{where}~~a,\theta_l >0.
+\]
+%The support is treated as fixed.
+
+%\vskip .25cm
+This is the Dirichlet-multinomial sampling model {\gr (Ferguson 1973)}.  
+
+
+\end{frame}
+
+\begin{frame}
+
+Now you've observed some data, say $\bm{Z} = \{\bm{z}_1 \ldots \bm{z}_n\}$.\\
+{\gr (say every $\bm{z}_i = [\bm{x}_i,y_i]$ is unique)}.
+
+\vskip .25cm
+The posterior over weights has $\theta_l \stackrel{ind}{\sim} \mr{Exp}\left(a+\ds{1}_{[\bs{\zeta}_l \in \bm{Z}]}\right)$. 
+
+\vskip .5cm
+{\bf A convenient limiting case}
+
+\vskip .25cm
 $a \to 0$ leads to $\mr{p}(\theta_l = 0) = 1$ for $\bs{\zeta}_l \notin \bm{Z}$.
+
+\vskip .2cm
+In this case, we can focus on only the {\it observed support} and write the posterior for our DGP
 \[
-\Rightarrow g(\bm{z}\mid\bm{Z}) = \tfrac{1}{|\bs{\theta}|}
-\sum_{l=1}^L \theta_l \ds{1}{[\bm{z} =
-\bm{z}_l]},~~~\theta_i \sim \mr{Exp}(1)
+g(\bm{z}) = \tfrac{1}{|\bs{\theta}|}
+\sum_{i=1}^n \theta_i \ds{1}{[\bm{z} =
+\bm{z}_i]},~~~\theta_i \stackrel{iid}{\sim} \mr{Exp}(1).
 \]
 
 \hfill
-{This is just the Bayesian bootstrap.}
-
-\hfill {\gr Ferguson 1973, Rubin 1981}
+{This is just the Bayesian bootstrap. \gr (Rubin 1981)}
 
 \end{frame}
 
@@ -218,31 +255,37 @@ where $\bs{\Theta} = \mr{diag}(\bs{\theta})$.
 
 \begin{frame}
 
-{\nv \bf What is the blue line? } \\BB sampling is great, but analytic approximations are also useful.
+{\nv \bf What is the blue line? } 
 
 \vskip .5cm
+BB sampling is great, but analytic approximations are also useful.
+
+\vskip .25cm
 Consider a first-order Taylor series approximation,
 \[
-\bs{\tilde \beta} = [\bm{X}'\bm{X}]^{-1}\bm{X}'y + 
+\bs{\tilde \beta} = \bs{\hat\beta}+ 
 \nabla \bs{\beta}\big |_{\bs{\theta}=\bm{1}} (\bs{\theta} - \bm{1})
 \]
+where $ \bs{\hat\beta} = [\bm{X}'\bm{X}]^{-1}\bm{X}'y = \bs{\beta}\big|_{ \bs{\theta}=\bm{1}}$ is the sample OLS line.
 
-We can derive {\it exact} posterior moments for $\bs{\tilde \beta}$ under $\theta_i \stackrel{iid}{\sim}\mathrm{Exp}(1)$.
+\vskip .5cm
+We can derive {\it exact} posterior moments for $\bs{\tilde \beta}$. e.g.,
+\[
+\mr{var}(\bs{\beta}) \approx \mr{var}(\bs{\tilde \beta}) = (\bm{X}^{\prime}\bm{X})^{-1}\bm{X}^{\prime}\mr{diag}(\bm{e}^2)\bm{X}^{\prime}(\bm{X}^{\prime}\bm{X})^{-1}
+\]
+ where $\bm{e}  = \bm{y} - \bm{X}[\bm{X}'\bm{X}]^{-1}\bm{X}'y$ are the sample OLS residuals.
 
 \vskip .25cm
-e.g., $\mr{var}(\bs{\tilde \beta}) \approx (\bm{X}^{\prime}\bm{X})^{-1}\bm{X}^{\prime}\mr{diag}(\bm{e})^2\bm{X}^{\prime}(\bm{X}^{\prime}\bm{X})^{-1}$, where $e_i  = y_i - \bm{x}_i'\bs{\hat\beta}$.
+This is the economist's Huber-White `Sandwich' variance formula.
 
-\vskip .25cm
-This is the familiar Huber-White `Sandwich' variance formula.
-
-\vskip .25cm{\gr \hfill
- See Lancaster 2003 or Poirier 2011.}
+\vskip .1cm{\gr \hfill
+ \small(Lancaster 2003 or Poirier 2011.)}
 
 \end{frame}
 
 \begin{frame}
 
-{\bf{\gr Example:} User-Specific Behavior in Experiments}
+{\bf{\gr Example:} Heterogeneous Treatment Effects}
 
 \vskip .5cm
 {\nv eBay runs lots of experiments:} they make changes to the marketplace (website) for random samples of users.
@@ -256,7 +299,7 @@ $d_i = 1$ for bigger pictures in my eBay.
 
 
 \vskip .25cm
-{\small $i\in{\sf c}: d_i=0$ \hspace{3.5cm} $i\in{\sf t}: d_i=1$}
+{\small $i\in{\sf control}: d_i=0$ \hspace{2.5cm} $i\in{\sf treatment}: d_i=1$}
 
 \includegraphics[scale=.5]{graphs/pottersmall}
 \includegraphics[scale=.5]{graphs/potterbig}
@@ -292,9 +335,7 @@ We know $\bm{x}_i$ about user $i$. {\gr About 400 features in our example.}
 
 \begin{frame}
 
-{\bf {\gr Example:} an HTE statistic that we care about.}
 
-\vskip .25cm
 Potential outcomes:
 \begin{itemize}
 \item $\upsilon_{i}(d)$ is the response for user
@@ -304,53 +345,30 @@ $i$ if $d_i = d$.
 We only observe one of $\upsilon_{i}(1)$ and $\upsilon_{i}(0)$: `$y$'.
 \end{itemize}
 
-\vskip .5cm
-We'd love to solve for `$\bs{\gamma}$' from the {\it moment condition}
+\vskip .25cm
+We'd love to model $\ds{E}[\upsilon_{i}(1)- \upsilon_{i}(0) | \bm{x}_i]$, but we can't directly.  
+
+\vskip .25cm
+Since $d \indep [\bm{x},\bs{\upsilon}]$, a good alternative is to consider 
 \[
-\ds{E}\left[\bm{x}(\upsilon({\sf t}) - \upsilon({\sf c})-\bm{x}'\bs{\gamma})\right] = \bs{0} 
+\ds{E}[\upsilon_{i}(1)|d_i=1,\bm{x}_i] - \ds{E}[\upsilon_{i}(0) |d_i=0,\bm{x}_i].
 \]
-But randomization implies $\ds{E}[\bm{x}\upsilon(d)] = \ds{E}[\bm{x}\upsilon(d) | d]$, so:
+Even simpler, just diff the OLS projections for each group
 \[
-\bs{\gamma} = 
-\ds{E}\left[\bm{x}\bm{x}'\right]^{-1}
-\bigg(\ds{E}[\bm{x}y |d=1] - \ds{E}[\bm{x}y|  d=0]\bigg)
-\]
-\hfill 
-{\gr This is a sort of OLS projection for treatment effects.}
-\end{frame}
-
-
-\begin{frame}
-
-As we did with OLS, consider a first-order approximation
-\begin{equation*}
-\bs{\tilde \gamma} = \bs{\hat \gamma} + 
-\nabla \bs{\gamma}\big|_{\bs{\theta}=\bm{1}} (\bs{\theta} - \bm{1}).
-\end{equation*}
-where
-\[
-\bs{\hat \gamma} = \bs{\gamma}\big|_{\bs{\theta}=\bm{1}} = n(\bm{X}'\bm{X})^{-1}
- \left(\frac{\bm{X}_{\sf t}'\bm{y}_{\sf t}}{n_{\sf t}} - 
- \frac{\bm{X}_{\sf c}'\bm{y}_{\sf c}}{n_{\sf c}}\right).
+\bs{\beta}_{\sf t} - \bs{\beta}_{\sf c} = (\bm{X}_{\sf t}'\bs{\Theta}_{\sf t}\bm{X}_{\sf t})^{-1}  \bm{X}_{\sf t}'\bs{\Theta}_{\sf t}\bm{y}_{\sf t} -
+ (\bm{X}_{\sf c}'\bs{\Theta}_{\sf c}\bm{X}_{\sf c})^{-1}  \bm{X}_{\sf c}'\bs{\Theta}_{\sf c}\bm{y}_{\sf c}
 \]
 
-This yields an approximate variance
-\[
-\mathrm{var}(\bs{\tilde\gamma}) \approx (\bm{X}'\bm{X})^{-1}\bm{X}'
-\mathrm{diag}(\bs{e}^\star)
-\bm{X}(\bm{X}'\bm{X})^{-1}
-\]
-with `treatment effect residuals' 
-\[
- e^\star_i = \left( \frac{\ds{1}_{[i\in {\sf t}]}}{n_{\sf t}} - \frac{\ds{1}_{[i\in {\sf c}]}}{n_{\sf c}}\right)ny_i -\bm{x}_i'\bs{\hat\gamma}.
-\] 
+{\gr \small See Taddy, Gardner, Chen, Draper 2014 for alternative linear projections.}
 
-\gr \hfill Or you can bootstrap, but it takes a long time.
 \end{frame}
 
 \begin{frame}
 
-e.g., coefficient on purchase within last-year vs an intercept:
+Since $\bs{\beta}_{\sf t} \indep \bs{\beta}_{\sf c}$, our results on BNP analysis of OLS apply directly.  Or you can bootstrap, but it takes a long time.
+
+\vskip .25cm
+e.g., coefficient on {\it [made purchase this year]} vs an intercept:
 
 \vskip .25cm
 {\footnotesize\it
@@ -360,12 +378,49 @@ e.g., coefficient on purchase within last-year vs an intercept:
 \includegraphics[width=.9\textwidth]{graphs/gammapost}
 \end{center}
 
-\vskip .25cm
 {\gr Sample is from posterior, contours are normal approximation.}
 
-{This is a statistic we care about}, even if the truth is nonlinear.
 
-\vskip -.5cm
+\end{frame}
+
+\begin{frame}
+
+$\bs{\beta}_{\sf t} - \bs{\beta}_{\sf c}$ is a statistic we care about, even if the truth is nonlinear.
+
+\vskip .25cm 
+The most basic application of an A/B experiment is estimating the average treatment effect,
+\[
+\text{ATE} = \ds{E}[\upsilon({\sf t})] -
+\ds{E}[\upsilon({\sf c})] 
+\] 
+The usual estimator is $\bar{y}_{\sf t} - \bar{y}_{\sf c}$.
+But many authors  advocate instead the `regression adjusted' $\bm{\bar x}'(\bs{\hat\beta}_{\sf t} - \bs{\hat\beta}_{\sf c})$  {\gr \small (Lin, Berk\texttt{+}, Deng\texttt{+}, 2013)}.
+
+\vskip .25cm
+Both are [frequentist] unbiased. 
+
+\vskip .25cm
+ But quantifying uncertainty about the regression adjustment, and any variance reduction it provides, is tough without assumptions.  
+
+\end{frame}
+
+\begin{frame}
+
+From our BNP persepective, both the usual and adjusted ATE estimators are random functions of the DGP.
+\begin{eqnarray*}
+\text{ATE}^\text{obs}_g &=& 
+\frac{1}{|\bs{\theta}_{\sf t}|}\bs{\theta}_{\sf t}'\bm{y}_{\sf t} - \frac{1}{|\bs{\theta}_{\sf c}|}\bs{\theta}_{\sf c}'\bm{y}_{\sf c}
+\\
+\text{ATE}^\text{lin}_g &=& \frac{1}{|\bs{\theta}|}\bs{\theta}'\bm{X}\bigg( (\bm{X}_{\sf t}'\bs{\Theta}_{\sf t}\bm{X}_{\sf t})^{-1}  \bm{X}_{\sf t}'\bs{\Theta}_{\sf t}\bm{y}_{\sf t} - (\bm{X}_{\sf c}'\bs{\Theta}_{\sf c}\bm{X}_{\sf c})^{-1}  \bm{X}_{\sf c}'\bs{\Theta}_{\sf c}\bm{y}_{\sf c}\bigg).
+\end{eqnarray*}
+
+Using our usual tricks, we can resolve any \textit{controversy}:
+\[
+\mr{var}\left(\text{ATE}^\text{lin}_g\right) \approx \mr{var}(\text{ATE}^\text{obs}_g) - \left( \frac{R^2_{\sf t}s^2_{\bm{y}_{\sf t_{\sf d}}}}{n^2_{\sf t}} +  
+\frac{R^2_{\sf c}s^2_{\bm{y}_{\sf c}}}{n^2_{\sf c}} \right),
+\]
+so that big variance reduction comes only for small sample $n_{\sf d}$ or large $R_{\sf d}^2 = \mr{cor}(y_{\sf d},\hat y_{\sf d})$.  {\theme In digital experiments we have big samples and low signal, so we shouldn't expect much variance reduction.}
+
 \end{frame}
 
 \begin{frame}
