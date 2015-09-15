@@ -68,7 +68,7 @@ Matt Taddy,  Chicago Booth
 \vskip .25cm
 {\nv The sample sizes are enormous.}
 \begin{itemize}
-\item we'll see 21 and 200 million today.  
+\item We'll see 21 and 200 million today.  
 \item Data can't fit in memory, or even storage, on a single machine.
 %\item Our familiar MCMC algorithms take too long.
 \end{itemize}
@@ -79,7 +79,7 @@ Matt Taddy,  Chicago Booth
 \begin{itemize}
 \item Internet transaction data distributions have a big spike at zero and spikes at other discrete values (e.g., 1 or \$99).
 \item Big tails (e.g., \$12 mil/month eBay user spend) that matter.
-\item The potential feature space is enourmous.
+\item The potential feature space is unmanageably large.
 \item We cannot  write down or measure believable models.
 \end{itemize}
 
@@ -416,7 +416,7 @@ From our BNP persepective, both the usual and adjusted ATE estimators are random
 
 Using our usual tricks, we can resolve any \textit{controversy}:
 \[
-\mr{var}\left(\text{ATE}^\text{lin}_g\right) \approx \mr{var}(\text{ATE}^\text{obs}_g) - \left( \frac{R^2_{\sf t}s^2_{\bm{y}_{\sf t_{\sf d}}}}{n^2_{\sf t}} +  
+\mr{var}\left(\text{ATE}^\text{lin}_g\right) \approx \mr{var}(\text{ATE}^\text{obs}_g) - \left( \frac{R^2_{\sf t}s^2_{\bm{y}_{\sf t}}}{n^2_{\sf t}} +  
 \frac{R^2_{\sf c}s^2_{\bm{y}_{\sf c}}}{n^2_{\sf c}} \right),
 \]
 so that big variance reduction comes only for small sample $n_{\sf d}$ or large $R_{\sf d}^2 = \mr{cor}(y_{\sf d},\hat y_{\sf d})$.  {\theme In digital experiments we have big samples and low signal, so we shouldn't expect much variance reduction.}
@@ -568,6 +568,23 @@ with $p$ split locations and $n$ observations.
 
 \begin{frame}
 
+{\bf Random Forest {\theme bottlenecks}}
+
+\vskip .5cm
+RFs (or BFs) are awesome, but when the data are too big to fit in memory or on a single machine they get extremely expensive.\\ {\gr \small (e.g., Google PLANET, Panda 2009)}.
+
+\vskip .5cm
+A common solution is a `sub-sampling forest': instead of drawing with-replacement, or re-weighting, draw $m \ll n$ sub-samples.
+
+\vskip .5cm
+This defeats the whole purpose of trees: these are rules that are designed to grow in complexity with the amount of data available. {\gr(that's why we bother storing so much data!)}
+
+\vskip .5cm If you starve the individual trees of data you lose.
+
+\end{frame}
+
+\begin{frame}
+
 {\bf Empirical Bayesian Forests ({\theme EBF})}
 
 \vskip .5cm
@@ -582,22 +599,30 @@ RFs are expensive.  Sub-sampling hurts bad.
 \end{itemize}
 
 \vskip .25cm
-Empirical Bayes: fix plug-in estimates at high levels in a hierarchical model, focus effort at learning the hard bits.
+Since the trunks are all similar for each tree in a full forest,
+our EBF looks nearly the same at a fraction of computational cost.
+
+\vskip .5cm
+It's an updated version of classical {\theme Empirical Bayes}: \\ ~~~use plug-in estimates at high levels in a hierarchical model, \\~~~focus effort at full Bayesian learning for the the hard bits.
 
 
 \end{frame}
 
 \begin{frame}
 
+{\bf OOS predictive performance on California Housing}
 
-Since the trunks are all the same for each tree in a full forest,
-our EBF looks nearly the same at a fraction of computational cost.
+
+
 
 \begin{center}
 \includegraphics[width=.85\textwidth]{graphs/ca_rmse}
 \end{center}
 
 Here EBF and BF give nearly the same results.  {\it SSF does not.}
+
+\vskip .25cm
+EBFs crunch more data faster without hurting performance.
 
 
 \end{frame}
@@ -683,23 +708,28 @@ Still, open questions:  e.g., more trees vs shallower trunk?
 
 \begin{frame}
 
-{\bf Catching Bad Buyer Experiences  at eBay}
+{\bf Catching {\theme Bad Buyer Experiences } at eBay}
 
 \vskip .5cm
 BBE: `not as described', delays, etc.
 
+\vskip .1cm
+$\mathrm{p}(\text{BBE})$
+is a key input to search rankings, and elsewhere.
+
 \vskip .5cm
-~$\mathrm{p}(\text{BBE})$
-is an input to search rankings.
+Big Data axiom:  best way to improve prediction is more data.  
 
-\vskip .1cm ~~~~Best way to improve prediction is more data.  
+\vskip .1cm 
+{\gr (a.k.a. `data beats model' )}
 
-\vskip .1cm ~~~~~~~~EBFs via Spark: more data in less time.
 
 \vskip .5cm
 On 200 million transactions,  EBF with 32 branches yields a\\ 1.5\% drop in misclassification over the SSF alternatives.  
 
 \vskip .5cm
+EBFs via Spark $\Rightarrow$ more data in less time.
+\vskip .1cm 
 Putting it into production requires some careful engineering, \\but this really is a very simple algorithm.  {\theme Big gain, little pain.} 
 
 \end{frame}
@@ -729,19 +759,43 @@ This works because
 \[
 \ds{E}[y^\star_i | \bs{\upsilon}_i] = 
 %q \upsilon_i(1)\frac{1 - q}{q(1-q)} - (1-q) \upsilon_i(0)\frac{q}{q(1-q)}
-\upsilon_i(1)- \upsilon_i(0)
+\upsilon_i(1)- \upsilon_i(0).
 \]
-where $\upsilon_i(d)$ is the potential outcome for user $i$ if $d_i = d$.\\  {\gr We only get to observe one of these: $y_i =
-\upsilon_i(d_i)$.}
+{\gr Recall: $\upsilon_i(d)$ is the potential outcome for user $i$ if $d_i = d$.}
 
 \end{frame}
 
 \begin{frame}
 
-We can apply the Bayesian bootstrap (i.e., fit a BF) to assess \\{\it posterior uncertainty} about these treatment-effect trees.
+A\texttt{+}I use Cross Validation to prune a single CART tree.
 
-\vskip .15cm
-e.g., sample depth-5 CART with min-leaf-size-$10^5$ after one week:
+\vskip .1cm
+But: CV doesn't work well for selection of {\it unstable} models.
+
+\vskip .1cm
+{\gr 
+Breiman 1996 is the classic paper on this and it's the motivation behind Random Forests in Breiman 2001: averaging beats pruning.}
+
+
+\vskip .5cm
+Of course, for many applications you need a single tree: e.g., in HTE modeling you can't show users an average of many websites.  
+
+\begin{center}\theme
+You need to choose!
+\end{center}
+
+So we're stuck with an imperfect method for choosing a single tree.
+
+\vskip .1cm
+But we can at least apply the Bayesian bootstrap (i.e., fit a BF) \\to assess {\it posterior uncertainty} about these treatment-effect trees.
+
+
+\end{frame}
+
+\begin{frame}
+
+
+e.g., Pruned CART with after one week:
 \begin{center}
 \includegraphics[width=.5\textwidth]{graphs/samptree_week1}
 \end{center}
@@ -765,29 +819,65 @@ After 5 weeks the tree is much more stable.
 We can quantify uncertainty about all sorts of structure.
 
 \vskip .5cm
-{\bf Posterior probability of CART splitting on variable}
-\begin{center}
-{\small
-\begin{tabular}{l|ccccc}
-\textbf{Week 5}& \multicolumn{5}{c}{\textit{depth in tree}}\\
- & $1$ & $\leq 2$ & $\leq 3$ & $\leq 4$ & $\leq 5$ \\
-\hline
-\rule{0pt}{1.25\normalbaselineskip}\textit{SI\,Fashion}
-& .45 & .50 & .50 & .50 & .50\\
-\textit{Bids\,Other} & .30 & .75 & .75 & .75 & .75\\
-\textit{VI\,sessions} & .05 & .05 & .05 & .10 & .35\\
-\textit{lastmonth} & .05 & .10 & .15 & .40 & .65\\
-\textit{SRP\,views} & .00 & .10 & .15 & .25 & .40\\
-\textit{VI\,views} & .00 & .00 & .10 & .20 & .25\\
-\textit{SYI\,views} & .00 & .00 & .05 & .15 & .25
-\end{tabular}}
-\end{center}
+A Bayesian Forest implies a {\theme proximity matrix}:
 
-\vskip .25cm
-$\Rightarrow$ easy scalable uncertainty quantification for complex algorithms.  
+\vskip .1cm
+~~~~ $n \times n$ with $i,j$ element  the proportion of trees \\
+~~~~ that have observations $i$ and $j$ in the same leaf.
+
+\vskip .1cm
+This proximity matrix maps from from the full sample \\to each observation's predicted value from the full tree.
+
+\vskip .5cm
+The average proximity between observations at each node measures how well a given tree is replicating this  structure.
 
 \end{frame}
 
+\begin{frame}
+
+
+e.g., Pruned CART with after one week:
+\begin{center}
+\includegraphics[width=.54\textwidth]{graphs/samptree_proxyatleaf_week1}
+\end{center}
+\hfill Average proxy: {\color{black!50} $\mr{p} <\tfrac{1}{3}$},
+{\color{black!75}  $\mr{p} \in
+\left[\tfrac{1}{3},\tfrac{1}{2}\right)$}, {\color{DarkRed}  $\mr{p}
+\in \left[\tfrac{1}{2},\tfrac{3}{4}\right]$}, and {\color{Blue} $\mr{p}
+\geq \tfrac{3}{4}$}.
+\end{frame}
+
+\begin{frame}
+
+Again: after 5 weeks the tree is much more stable.
+\begin{center}
+\includegraphics[width=.9\textwidth]{graphs/samptree_proxyatleaf_week5}
+\end{center}
+\hfill Average proxy: {\color{black!50} $\mr{p} <\tfrac{1}{3}$},
+{\color{black!75}  $\mr{p} \in
+\left[\tfrac{1}{3},\tfrac{1}{2}\right)$}, {\color{DarkRed}  $\mr{p}
+\in \left[\tfrac{1}{2},\tfrac{3}{4}\right]$}, and {\color{Blue} $\mr{p}
+\geq \tfrac{3}{4}$}.
+
+\end{frame}
+
+\begin{frame}
+
+
+{\bf \gr Can we do better?}
+
+\vskip .5cm
+BNP and BFs provide scalable uncertainty quantification for trees.
+
+\vskip .5cm An open question: can we use it to find a better single tree?
+
+\vskip .5cm Posterior mean is usually best for prediction, but the {\it median} tends to be a better option than the mode ($\approx$ the single CART tree).
+
+\vskip .5cm
+Can we find a tree that is approximately in the middle of our forest?  Or, consider the graph defined by thresholding proximity at 0.5:  can we recover a tree that yields a similar partitioning?
+
+
+\end{frame}
 
 \begin{frame}
 
@@ -796,7 +886,9 @@ $\Rightarrow$ easy scalable uncertainty quantification for complex algorithms.
 
 \vskip .25cm I think about BNP as a way to analyze (and improve) algorithms.  
 
-Decouple  action/prediction from the full generative process model.
+Decouple action/prediction from the full generative process model.
+
+\vskip .25cm  This type of analysis is key for taking these algorithms from ML \\to fields like Economics that really care about uncertainty.
 
 \vskip .75cm
 {\bf Efficient Big Data analysis}
@@ -807,7 +899,9 @@ To cut computation without hurting performance, we need to think about what port
 \vskip .25cm
 Once we figure this out,  we can use a little bit of the data to\\ learn the easy stuff and direct our full data at the hard stuff.
 
-\vskip 1cm
+\vskip .25cm
+This is {\it the} future for Big Data.
+
 \hfill \huge \theme \bf thanks!
 
 \end{frame}
