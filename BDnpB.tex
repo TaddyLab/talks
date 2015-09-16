@@ -273,7 +273,7 @@ We can derive {\it exact} posterior moments for $\bs{\tilde \beta}$. e.g.,
 \[
 \mr{var}(\bs{\beta}) \approx \mr{var}(\bs{\tilde \beta}) = (\bm{X}^{\prime}\bm{X})^{-1}\bm{X}^{\prime}\mr{diag}(\bm{e}^2)\bm{X}^{\prime}(\bm{X}^{\prime}\bm{X})^{-1}
 \]
- where $\bm{e}  = \bm{y} - \bm{X}[\bm{X}'\bm{X}]^{-1}\bm{X}'y$ are the sample OLS residuals.
+ where $\bm{e}  = \bm{y} - \bm{X}\bs{\hat\beta}$ are the sample OLS residuals.
 
 \vskip .25cm
 This is the economist's Huber-White `Sandwich' variance formula.
