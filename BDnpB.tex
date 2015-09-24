@@ -790,7 +790,7 @@ This works because
 A\texttt{+}I use Cross Validation to prune a single CART tree.
 
 \vskip .1cm
-But: CV doesn't work well for selection of {\it unstable} models.
+But: CV can perform poorly for selection of {\it unstable} models.
 
 \vskip .1cm
 {\gr 
@@ -798,18 +798,13 @@ Breiman 1996 is the classic paper on this and it's the motivation behind Random 
 
 
 \vskip .5cm
-Of course, for many applications you need a single tree: e.g., in HTE modeling you can't show users an average of many websites.  
-
-\begin{center}\theme
-You need to choose!
-\end{center}
-
-So we're stuck with an imperfect method for choosing a single tree.
+How good are the trees in this case?
 
 \vskip .1cm
-But we can at least apply the Bayesian bootstrap (i.e., fit a BF) \\to assess {\it posterior uncertainty} about these treatment-effect trees.
+We can apply the Bayesian bootstrap (i.e., fit a BF) to assess {\it posterior uncertainty} about the selected treatment-effect trees.
 
-
+\vskip .5cm
+{\gr\small (BTW if you don't need a single tree, a better solution might be to just partition by predicted treatment effect from the forest, say $>$ or $<$ zero.)}
 \end{frame}
 
 \begin{frame}
@@ -878,24 +873,6 @@ Again: after 5 weeks the tree is much more stable.
 \left[\tfrac{1}{3},\tfrac{1}{2}\right)$}, {\color{DarkRed}  $\mr{p}
 \in \left[\tfrac{1}{2},\tfrac{3}{4}\right]$}, and {\color{Blue} $\mr{p}
 \geq \tfrac{3}{4}$}.
-
-\end{frame}
-
-\begin{frame}
-
-
-{\bf \gr Can we do better?}
-
-\vskip .5cm
-BNP and BFs provide scalable uncertainty quantification for trees.
-
-\vskip .5cm An open question: can we use it to find a better single tree?
-
-\vskip .5cm Posterior mean is usually best for prediction, but the {\it median} tends to be a better option than the mode ($\approx$ the single CART tree).
-
-\vskip .5cm
-Can we find a tree that is approximately in the middle of our forest?  Or, consider the graph defined by thresholding proximity at 0.5:  can we recover a tree that yields a similar partitioning?
-
 
 \end{frame}
 
