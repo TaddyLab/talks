@@ -4,7 +4,7 @@
 
 % replaces beamer foot with simple page number
 \setbeamertemplate{navigation symbols}{}
-%\setbeamerfont{frametitle}{series=\bfseries}
+\setbeamerfont{frametitle}{series=\bfseries,size=\normalsize}
 \setbeamercolor{frametitle}{fg=Black}
 
 \setbeamertemplate{footline}{
@@ -444,28 +444,360 @@ The algorithm moves {\it right to left}.  \\The $y$-axis is $\bs{\hat\beta}$ (ea
 
 \begin{frame}\
 
-{\bf {\nv Example: } Comscore web browser data}
+{\bf {\nv Example: } web browser data}
 
 \vskip .5cm
 The previous plot is  household log-online-spend regressed onto $\%$ of time spent on various websites (each $\beta_j$  a different site).
 
 \vskip .25cm
-Comscore records info on browsing\\ and purchasing behavior for annual panels of households.
+Browsing and purchasing behavior for households:
 
-\vskip .25cm
-I've extracted 2006 data for the 1000 most heavily trafficked websites and for 10,000 households that spent at least 1\$.  
+\vskip .05cm
+~I've extracted 2006 data for the 1000 most heavily trafficked \\~websites and for 10,000 households that spent at least 1\$.  
 
 
 \vskip .25cm
 Why do we care?  {\theme Predict consumption from browser history.}
 
-\vskip .1cm
-{
-e.g., to control for base-level spending, say, in estimating advertising effectiveness.  
-You'll see browser history of users when they land, but likely not what they have bought.  }
 
 \vskip .5cm
-{\sf\nv http://faculty.chicagobooth.edu/matt.taddy/teaching/comscore.R}
+{\sf\nv faculty.chicagobooth.edu/matt.taddy/teaching/comscore.R}
+\end{frame}
+
+
+\begin{frame}
+
+
+There are many packages for fitting lasso regressions in R.
+
+\vskip .25cm
+{\tt \nv glmnet} is most common.  {\tt \nv gamlr} is my contribution.
+
+These two are very similar, and they share syntax.
+
+\vskip .25cm
+Big difference is what they do beyond a simple lasso:.
+
+~~~{\tt\nv glmnet} does an `elastic net':  $c(\beta) = |\beta| + \nu \beta^2$.
+
+~~~{\tt\nv gamlr} does  a `gamma lasso': $c(\beta) \approx \log(\nu + |\beta|)$.
+
+\vskip .5cm  
+Both use the {\tt \nv Matrix} library representation for {\theme sparse matrices}.
+\end{frame}
+
+\begin{frame}
+
+A little bit more info on {\tt\nv gamlr}: \\ ~~~it actually applies a {\theme weighted}
+$L_1$ penalty: $\lambda \sum_j \omega_j |\beta_j|$.  
+
+\vskip .25cm
+These weights {\theme adapt} along the regularization path as a function of the previous segment's solution
+\begin{equation}\label{gammalasso}
+\omega^{t}_j  = \left(1 + \gamma |\hat\beta^{t-1}_j|\right)^{-1} ~~j=1\ldots p 
+\end{equation}
+This lets you measure {\theme large signals with less bias}.
+
+\vskip .25cm
+\includegraphics[width=\textwidth]{graphs/gamlr_eg}
+
+
+\hfill See {\it Paths of One-Step Estimators} on my website.
+\vskip -.2cm
+ \end{frame}
+
+
+\begin{frame}
+
+{\bf Regularization and Selection}
+\vskip .5cm
+
+
+{The  lasso minimizes $-\frac{2}{n}\log\text{LHD}(\bs{\beta}) + \lambda \sum_j |\beta_j|$.}
+
+\vskip .1cm
+This `sparse regularization' auto-selects the variables.  
+
+\vskip .1cm
+{Sound too good to be true?  You need to choose $\lambda$.}
+
+\vskip .5cm
+Think of $\lambda>0$ as a signal-to-noise filter: {\it like squelch on a radio.}
+
+
+
+\vskip .5cm We'll  use {\theme cross validation} or {\nv information criteria} to choose.
+
+
+\vskip .5cm
+Path algorithms are key to the whole framework:
+
+\vskip .1cm
+$\star$ They let us quickly enumerate a set of candidate models.
+
+$\star$ This set is stable, so selected `best' is probably pretty good.
+
+\end{frame}
+
+\begin{frame}
+
+A recipe for model selection.
+\begin{enumerate}\bk
+\item Find a manageable set of candidate models \\{(i.e., such that fitting all models is fast).}
+\item Choose amongst these candidates the one with\\ best
+predictive performance {\it on unseen data}.
+\end{enumerate}
+
+\vskip .5cm
+{\nv 1.} is what the lasso paths provide.
+
+\vskip .1cm
+{\nv 2.} Seems impossible!  But it's not $\ldots$
+
+\vskip .5cm 
+First, define {\nv predictive performance} via `deviance'. 
+
+\vskip .1cm
+Then, we need to {\it estimate} deviance for a fitted model applied to {\it new independent observations} from the true data distribution.
+
+\end{frame}
+
+
+\begin{frame}
+{\theme $\bs{K}$-fold Cross Validation}
+
+\vskip -.3in
+\hfill\includegraphics[width=2in]{graphs/fold}
+
+\vskip -.9in {\gr One option is to just take \\repeated random samples.
+\\
+It is better to `fold' your data.}
+
+\vskip 1cm
+$\bullet$ Sample a random ordering of the data \\ { ~~(important to avoid order dependence)}
+
+\vskip .1cm $\bullet$ Split the data into $K$ folds: { 1st 100/K\%, 2nd 100/K\%, etc}.
+
+\vskip .1cm 
+$\bullet$ Cycle through $K$ CV iterations with a single fold left-out.
+
+\vskip .25cm
+This guarantees each observation is left-out for validation, \\and lowers the sampling variance of CV model selection.
+
+\vskip .25cm
+Leave-one-out CV, with $K=n$, is nice but takes a long time.\\
+$K=5$ to $10$ is fine in most applications.
+
+\end{frame}
+
+
+\begin{frame}
+{CV Lasso}
+
+The lasso path algorithm minimizes $-\frac{2}{n}\log\text{LHD}(\bs{\beta}) + \lambda_t \sum_j |\beta_j|$ over the sequence of penalty weights $\lambda_1 > \lambda_2 \ldots > \lambda_T$.
+
+\vskip .25cm
+This gives us a path of $T$ fitted coefficient vectors, 
+$\nv \bs{\hat\beta}_1 \ldots \bs{\hat\beta}_T$,
+each defining deviance for new data: $\nv -\log \text{p}(\bm{y}^{new}\mid\bm{X}^{new}\bs{\hat\beta}_t)$.
+
+\vskip .5cm
+Set a sequence of penalties $\lambda_1 \ldots \lambda_T$.  \\
+Then, for each of $k=1\ldots K$ folds,
+\begin{itemize}
+\item Fit the path $\nv \bs{\hat\beta}^k_1 \ldots \bs{\hat\beta}^k_T$ on all data {\it except} fold $k$.
+\item Get fitted deviance {\it on left-out data}: 
+$\nv -\log \text{p}(\bm{y}^{k}\mid\bm{X}^{k}\bs{\hat\beta}_t)$.
+\end{itemize}
+
+This gives us $K$ draws of OOS deviance for each $\lambda_t$.
+
+\vskip .5cm
+Finally, use the results to choose the `best' $\theme \hat\lambda$, then re-fit the model to {\it all of the data} 
+by minimizing $-\frac{2}{n}\log\text{LHD}(\bs{\beta}) 
++ {\theme \hat \lambda} \sum_j |\beta_j|$.
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+{CV Lasso}
+
+{Both {\tt gamlr} and {\tt glmnet} have functions to wrap this all up.}
+
+The syntax is the same; just preface with {\tt cv.}
+
+\begin{semiverbatim}\nv
+cv.spender <- cv.gamlr(xweb, log(yspend))
+\end{semiverbatim}
+
+Then, {\nv\tt coef(cv.spender)} gives you $\bs{\hat\beta}_t$ at the `best' $\lambda_t$
+\begin{itemize}
+\item {\tt select="min"} gives $\lambda_t$ with {\it min average OOS deviance}.
+\item {\tt select="1se"} defines best as {\it biggest $\lambda_t$ with average OOS deviance no more than 1SD away from the minimum.}
+\end{itemize}
+
+\vskip .2cm
+{\tt 1se} is default, and balances prediction against false discovery.  
+
+{\tt min} is purely focused on predictive performance.
+
+\end{frame}
+
+
+\begin{frame}
+{CV Lasso}
+
+\vskip .25cm
+
+Again, the routine is most easily understood visually.
+
+\vskip -.25cm
+\begin{center}
+\includegraphics[width=\textwidth]{graphs/comscore_cvmarkedup}
+\end{center}
+
+\vskip -.25cm
+Both selection rules are good; {\tt 1se} has extra bias for simplicity.
+\end{frame}
+
+\begin{frame}
+{Problems with Cross Validation}
+
+\vskip .5cm \nv It is time consuming:
+{\bk When estimation is not instant, \\
+fitting $K$ times can become unfeasible even $K$ in 5-10. }
+
+\vskip .5cm It can be unstable: {\bk imagine doing CV on many different samples.  
+There can be large variability on the model chosen.}
+
+\vskip .5cm It is hard not to cheat: {\bk for example, with the FDR cut model we've
+already used the full $n$ observations to  select the 25 strongest
+variables.  It is not surprising they do well `OOS'.}
+
+{\gr The rules: if you do something to the data, do it {\it inside} CV.}
+
+\vskip .5cm \bk Still, some form of CV is used in most DM applications.
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+
+{
+\bf \gr Alternatives to CV: \bk Information Criteria}
+
+\vskip .25cm
+{Many `Information Criteria' out there: AICc, AIC, BIC, ...}
+
+These approximate distance between a model and `the truth'.
+
+You can apply them by choosing the model with minimum IC.
+
+\vskip .5cm
+Most common is Akaike's {\theme AIC = Deviance + $2df$.}
+
+\vskip .2cm
+$df$ = `degrees of freedom' used in your model fit.
+
+For lasso and MLE, this is just the $\#$ of nonzero $\hat\beta_j$.
+
+\end{frame}
+
+\begin{frame}
+{AIC overfits in high dimensions}
+
+The AIC is atually estimating OOS deviance: 
+what your deviance would be on another {\it independent} sample of size $n$.
+
+\vskip .5cm
+IS deviance is too small, since the model is tuned to this data.  \\Some deep theory shows that IS - OOS deviance $\approx 2df$.
+\vskip .1cm
+
+\hskip 2in $\Rightarrow \text{AIC} \approx$ OOS deviance.
+
+\vskip .5cm
+Its common to claim this approx (i.e., AIC) is good for `big $n$'.
+
+{\theme Actually, its only good for big $n/df$. } 
+
+\vskip .5cm
+In Big Data, $df$ (\# parameters) can be huge.  Often $df\approx n$.
+
+In this case the AIC will be a bad approximation: it overfits!
+
+\end{frame}
+
+\begin{frame}
+{AIC corrected: \nv AICc}
+
+AIC approximates OOS deviance, but does a bad job for big $df$.
+ 
+\vskip .5cm
+In linear regression an improved approx to OOS deviance is
+\[
+\theme \text{AICc} { ~\gr = \text{Deviance} + 2df\ds{E}\left[\frac{\sigma^2}{\hat \sigma^2}\right]} = \text{Deviance} + 2df\frac{n}{n-df-1}
+\]
+This is the corrected AIC, or AICc.  
+
+\vskip .05cm
+{It also works nicely in logistic regression, or for any {\tt glm}.}
+
+\vskip .5cm
+Notice that for big $n/df$, AICc $\approx$ AIC. So {\it always} use AICc.
+
+\end{frame}
+
+\begin{frame}[fragile]
+{gamlr uses AICc}
+
+\vskip .25cm
+
+{It's marked on the path plot}
+
+\vskip .25cm
+\hskip .5in \includegraphics[width=.8\textwidth]{graphs/comscore_pathaicc}
+
+\vskip .1cm
+And it is the default for {\tt coef.gamlr}
+
+\begin{semiverbatim}\nv\small
+B <- coef(spender)[-1,] 
+B[c(which.min(B),which.max(B))]\bk
+    cursormania.com shopyourbargain.com 
+          -0.998143            1.294246 
+\end{semiverbatim}
+
+\end{frame}
+
+
+\begin{frame}
+{IC and CV on the Comscore Data}
+
+\includegraphics[width=\textwidth]{graphs/comscore_icvcv}
+
+\vskip .5cm
+The take home message: AICc curve looks like CV curve.
+
+ \vskip .25cm
+In practice, BIC works more like the 1se CV rule.  \\
+But with big $n$ it chooses too simple models (it underfits).
+
+\end{frame}
+
+
+\begin{frame}
+{IC and CV on the Comscore Data}
+
+\includegraphics[width=\textwidth]{graphs/comscore_pathallic}
+
+\vskip .2cm
+With all of these selection rules, you get a range of answers.
+
+If you have time, do CV.  But AICc is fast and stable.
+
+If you are worried about false discovery, tend towards BIC/1se.
+
 \end{frame}
 
 
