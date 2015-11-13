@@ -208,6 +208,180 @@ g(\bm{z}) = \tfrac{1}{|\bs{\theta}|}
 
 \end{frame}
 
+
+\begin{frame}
+
+\vskip .25cm
+Recall your early stats: {\theme the sampling distribution.}
+
+\vskip .1cm
+Imagine getting multiple datasets of size $n$ from the population.
+
+\vskip .1cm
+The {\it sampling distribution} of an estimator $\hat \beta$\\ is
+the histogram of your estimates for each dataset.
+
+
+\vskip .25cm
+\includegraphics[width=4.2in]{graphs/bs_boothist}
+
+\vskip -.2cm
+$
+~\begin{array}{c}\downarrow\\
+    \hat\beta_1\\
+    ~~\searrow
+\end{array}
+$
+\hskip 1.1cm
+$
+\begin{array}{c}\downarrow\\
+    \hat\beta_2\\
+    ~~\searrow
+\end{array}
+$
+\hskip 1.1cm
+$
+\begin{array}{c}\downarrow\\
+    \hat\beta_3\\
+    \downarrow
+\end{array}
+$
+\hskip 1.1cm
+$
+\begin{array}{c}\downarrow\\
+    \hat\beta_4\\
+    \swarrow~~
+\end{array}
+$
+\hskip 1.1cm
+$
+\begin{array}{c}\downarrow\\
+    \hat\beta_5\\
+    \swarrow~~
+\end{array}
+$
+
+\begin{center}
+\includegraphics[width=2.25in]{graphs/boothist}
+\end{center}
+ 
+
+\vskip -.5cm
+\end{frame}
+
+\begin{frame}
+
+
+{\bf \theme The Bootstrap:} resample your data {\it with replacement} \\
+~~~~~~~~~~~~~~~~~~ and calculate  some statistic of interest.  
+
+\vskip .1cm {\it \gr With-Replacement: each draw is put back in the `bucket', so it is possible to sample the same
+observation multiple times.  }
+
+\vskip .5cm
+To raise oneself up by bootstraps...  
+{\gr (Try it; it doesn't work).}
+
+\vskip .05cm    The metaphor refers
+to surprising examples of self sufficiency.
+
+\vskip .5cm
+For $b=1\ldots B$ `bootstrap samples'
+\begin{itemize}\nv
+\item Resample {\theme with replacement} $n$ observations.
+\item Calculate your estimate (e.g., $\hat\beta_b$).
+\end{itemize}
+
+\vskip .5cm
+This is an {\it approximation} to the sampling distribution.
+
+\vskip .1cm
+For example, an approx SE($\hat\beta$) is
+$\mr{sd}(\hat\beta) =\sqrt{\frac{1}{B}
+\sum_b (\hat \beta_b - \bar{\beta})^2}.
+$
+
+\end{frame}
+
+
+\begin{frame}
+
+{\bf \theme The Bootstrap: \bk why it works}
+
+\begin{center}
+\includegraphics[width=2in]{graphs/bs_bighist}
+
+{\gr data sample}
+
+$\swarrow~~~\downarrow~~~\searrow$
+
+\includegraphics[width=4.25in]{graphs/bs_boothist}
+
+\gr bootstrap samples
+\end{center}
+
+You are pretending that the {\it empirical data distribution} is
+the population, and using it to draw alternative samples.
+\end{frame}
+
+
+
+\begin{frame}
+
+{\bf The {\nv Bayesian} Bootstrap}
+
+\begin{center}
+\includegraphics[width=\textwidth]{graphs/bayesbootprior}
+
+{\gr prior samples}
+
+$\downarrow~~~~\downarrow~~~~\downarrow$
+
+\includegraphics[width=\textwidth]{graphs/bayesbootpost}
+
+\gr posterior samples
+\end{center}
+
+You have a nonparametric model over {\it all} possible observations, but then
+use a convenient prior that limits you to observed support.
+
+\vskip .5cm
+It'll work whenever the standard Bootstrap works: only if the empirical data distribution 
+is a decent substitute for the population.
+
+\end{frame}
+
+% z <- x <- c()
+% dz <- dx <- c()
+% for(i in 1:5){
+%  x <- cbind(x,rnorm(20))
+%  z <- cbind(z,rnorm(50))
+%  dx <- cbind(dx,dnorm(x[,i])*runif(20))
+%  dz <- cbind(dz,dnorm(z[,i])*runif(50))}
+
+% pdf("graphs/bayesbootprior.pdf",width=10,height=1)
+% par(mai=c(0,.2,0,.2),mfrow=c(1,5))
+% for(i in 1:5){
+%  plot(z[,i],dz[,i],type="h",col="grey80",ylim=c(0,max(c(dx,dz))),
+%   xaxt="n",yaxt="n", bty="n",lwd=4,xlab="",ylab="")
+%  lines(x[,i],dx[,i],type="h",col="navy",lwd=3)}
+% dev.off()
+
+% z <- x <- c()
+% dz <- dx <- c()
+% for(i in 1:5){
+%  x <- cbind(x,rnorm(20))
+%  z <- cbind(z,rnorm(50))
+%  dx <- cbind(dx,dnorm(x[,i])*runif(20))
+%  dz <- cbind(dz,dnorm(z[,i])*runif(50))}
+
+% pdf("graphs/bayesbootpost.pdf",width=10,height=1)
+% par(mai=c(0,.2,0,.2),mfrow=c(1,5))
+% for(i in 1:5)
+%     plot(x[,i],dx[,i],type="h",col="navy",
+%      xaxt="n",yaxt="n", bty="n",lwd=4,xlab="",ylab="")
+% dev.off()
+
 \begin{frame}
 
 {\bf {\gr Example: } Ordinary Least Squares}
@@ -224,34 +398,37 @@ where $\bs{\Theta} = \mr{diag}(\bs{\theta})$.
 \includegraphics[width=\textwidth]{graphs/ozone}
 \end{frame}
 
-% \begin{frame}[fragile]
+\begin{frame}[fragile]
 
-% {\footnotesize\gr
-% \begin{verbatim}
-% data(airquality); n <- nrow(airquality)
-% B <- 1000; beta <- vector(length=B)
-% for(b in 1:B){
-%   fit <- lm(Ozone ~., data=airquality, weights=rexp(n))
-%   beta[b] <- coef(fit)["Wind"] }
-% sampfit <- lm(Ozone ~ ., data=airquality)
-% coef <- summary(sampfit)$coef["Wind",1:2]
-% x <- as.matrix(cbind(1,na.omit(airquality)[,-1]))
-% xxi <- solve(crossprod(x))
-% sandwich <- xxi%*%t(x)%*%diag(sampfit$resid^2)%*%x%*%xxi
-% hist(beta, col=8, main="", 
-%   xlab="Coefficient for Ozone on Wind", 
-%   freq=FALSE,ylim=c(0,0.6),breaks=25)
-% grid <- seq(-6,5,length=500)
-% lines(grid, dnorm(grid,coef[1],coef[2]),col=2,lwd=2)
-% lines(grid, dnorm(grid,coef[1],sqrt(sandwich[3,3])),col=4,lwd=2)
-% legend("topleft",col=c(8,2),lwd=4, 
-%   legend=c("bootstrap BNP posterior",
-%            "normal approx BNP posterior",
-%            "standard sampling distribution"),bty="n")
-% \end{verbatim}
-% }
+{\footnotesize\gr
+\begin{verbatim}
+data(airquality); n <- nrow(airquality)
+B <- 1000; beta <- vector(length=B)
+for(b in 1:B){
+  fit <- lm(Ozone ~., data=airquality, weights=rexp(n))
+  beta[b] <- coef(fit)["Wind"] }
+sampfit <- lm(Ozone ~ ., data=airquality)
+coef <- summary(sampfit)$coef["Wind",1:2]
+x <- as.matrix(cbind(1,na.omit(airquality)[,-1]))
+xxi <- solve(crossprod(x))
+sandwich <- xxi%*%t(x)%*%diag(sampfit$resid^2)%*%x%*%xxi
+hist(beta, col=8, main="", 
+  xlab="Coefficient for Ozone on Wind", 
+  freq=FALSE,ylim=c(0,0.6),breaks=25)
+grid <- seq(-6,5,length=500)
+lines(grid, dnorm(grid,coef[1],coef[2]),col=2,lwd=2)
+lines(grid, dnorm(grid,coef[1],sqrt(sandwich[3,3])),col=4,lwd=2)
+legend("topleft",col=c(8,2),lwd=4, 
+  legend=c("bootstrap BNP posterior",
+           "normal approx BNP posterior",
+           "standard sampling distribution"),bty="n")
+\end{verbatim}
+}
 
-% \end{frame}
+\end{frame}
+
+
+
 
 \begin{frame}
 
