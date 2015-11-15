@@ -581,12 +581,11 @@ $\bullet$ Sample a random ordering of the data \\ { ~~(important to avoid order 
 \vskip .1cm 
 $\bullet$ Cycle through $K$ CV iterations with a single fold left-out.
 
-\vskip .25cm
-This guarantees each observation is left-out for validation, \\and lowers the sampling variance of CV model selection.
+\vskip .5cm {\nv Be careful to not cheat:} {\bk for example, with the FDR cut model we've
+already used the full $n$ observations to  select the 25 strongest
+variables.  It is not surprising they do well `OOS'.}
 
-\vskip .25cm
-Leave-one-out CV, with $K=n$, is nice but takes a long time.\\
-$K=5$ to $10$ is fine in most applications.
+{\gr The rules: if you do something to the data, do it {\it inside} CV.}
 
 \end{frame}
 
@@ -671,11 +670,6 @@ fitting $K$ times can become unfeasible even $K$ in 5-10. }
 \vskip .5cm It can be unstable: {\bk imagine doing CV on many different samples.  
 There can be large variability on the model chosen.}
 
-\vskip .5cm It is hard not to cheat: {\bk for example, with the FDR cut model we've
-already used the full $n$ observations to  select the 25 strongest
-variables.  It is not surprising they do well `OOS'.}
-
-{\gr The rules: if you do something to the data, do it {\it inside} CV.}
 
 \vskip .5cm \bk Still, some form of CV is used in most DM applications.
 \end{frame}
