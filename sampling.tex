@@ -1,0 +1,114 @@
+\documentclass[11pt,xcolor=svgnames]{beamer}
+\usepackage{dsfont,natbib,setspace,changepage,multirow}
+\mode<presentation>
+
+% replaces beamer foot with simple page number
+\setbeamertemplate{navigation symbols}{}
+%\setbeamerfont{frametitle}{series=\bfseries}
+\setbeamercolor{frametitle}{fg=Black}
+
+\setbeamertemplate{footline}{
+   \raisebox{5pt}{\makebox[\paperwidth]{\hfill\makebox[20pt]{\color{gray}\scriptsize\insertframenumber}}}}
+
+\graphicspath{{/Users/mtaddy/Dropbox/inputs/}}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+% colors
+\newcommand{\theme}{\color{Maroon}}
+\newcommand{\bk}{\color{black}}
+\newcommand{\rd}{\color{DarkRed}}
+\newcommand{\fg}{\color{ForestGreen}}
+\newcommand{\bl}{\color{blue}}
+\newcommand{\gr}{\color{black!67}}
+\newcommand{\sg}{\color{DarkSlateGray}}
+\newcommand{\nv}{\color{Navy}}
+\setbeamercolor{itemize item}{fg=gray}
+
+% common math markups
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+\newcommand{\mr}[1]{\mathrm{#1}}
+\newcommand{\bm}[1]{\mathbf{#1}}
+\newcommand{\ds}[1]{\mathds{#1}}
+\newcommand{\indep}{\perp\!\!\!\perp}
+\def\plus{\texttt{+}}
+\def\minus{\texttt{-}}
+
+% spacing and style shorthand
+\setstretch{1.1} 
+
+\begin{document}
+
+\begin{frame}[plain]
+
+{\bf Sampling and Surveys}
+
+\vskip .25cm
+Always a key aspect of good sampling designs: figure out what is hard to learn and what is easy to learn.
+
+\begin{itemize}
+\item Stratification: over sample groups with high variance
+\item Try hard to reach members of strata with low response rates.
+\end{itemize}
+
+\vskip .25cm
+The same idea applies in Big Data!  \\The key is to use your computational effort (and full data) on the stuff that is hard to learn.
+
+\begin{itemize}
+\item Empirical Bayes type strategies.
+\item e.g., fixing high levels in hierarchical models and using conditional independence to partition data.
+\end{itemize}
+
+\end{frame} 
+
+\begin{frame}
+
+{\bf So what is hard, and what is easy?}
+
+\vskip .5cm
+For us, hard = expensive and easy = cheap.
+
+\vskip .1cm  When can we use cheap web/social data instead of a survey?
+
+\vskip .5cm
+You won't know until you try.  Do both, and try to predict the survey results from the cheap data sources.  
+
+\vskip .2cm
+If you can do this reliably, then the learning problem is easy/cheap.  If not, it is hard/expensive.
+
+\vskip .2cm
+Unfortunately, the answer will change over time.  You'll always need some survey data to keep the cheap predictor honest.
+\end{frame}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
