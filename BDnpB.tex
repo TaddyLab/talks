@@ -209,147 +209,147 @@ g(\bm{z}) = \tfrac{1}{|\bs{\theta}|}
 \end{frame}
 
 
-\begin{frame}
+% \begin{frame}
 
-\vskip .25cm
-Recall your early stats: {\theme the sampling distribution.}
+% \vskip .25cm
+% Recall your early stats: {\theme the sampling distribution.}
 
-\vskip .1cm
-Imagine getting multiple datasets of size $n$ from the population.
+% \vskip .1cm
+% Imagine getting multiple datasets of size $n$ from the population.
 
-\vskip .1cm
-The {\it sampling distribution} of an estimator $\hat \beta$\\ is
-the histogram of your estimates for each dataset.
+% \vskip .1cm
+% The {\it sampling distribution} of an estimator $\hat \beta$\\ is
+% the histogram of your estimates for each dataset.
 
 
-\vskip .25cm
-\includegraphics[width=4.2in]{graphs/bs_boothist}
+% \vskip .25cm
+% \includegraphics[width=4.2in]{graphs/bs_boothist}
 
-\vskip -.2cm
-$
-~\begin{array}{c}\downarrow\\
-    \hat\beta_1\\
-    ~~\searrow
-\end{array}
-$
-\hskip 1.1cm
-$
-\begin{array}{c}\downarrow\\
-    \hat\beta_2\\
-    ~~\searrow
-\end{array}
-$
-\hskip 1.1cm
-$
-\begin{array}{c}\downarrow\\
-    \hat\beta_3\\
-    \downarrow
-\end{array}
-$
-\hskip 1.1cm
-$
-\begin{array}{c}\downarrow\\
-    \hat\beta_4\\
-    \swarrow~~
-\end{array}
-$
-\hskip 1.1cm
-$
-\begin{array}{c}\downarrow\\
-    \hat\beta_5\\
-    \swarrow~~
-\end{array}
-$
+% \vskip -.2cm
+% $
+% ~\begin{array}{c}\downarrow\\
+%     \hat\beta_1\\
+%     ~~\searrow
+% \end{array}
+% $
+% \hskip 1.1cm
+% $
+% \begin{array}{c}\downarrow\\
+%     \hat\beta_2\\
+%     ~~\searrow
+% \end{array}
+% $
+% \hskip 1.1cm
+% $
+% \begin{array}{c}\downarrow\\
+%     \hat\beta_3\\
+%     \downarrow
+% \end{array}
+% $
+% \hskip 1.1cm
+% $
+% \begin{array}{c}\downarrow\\
+%     \hat\beta_4\\
+%     \swarrow~~
+% \end{array}
+% $
+% \hskip 1.1cm
+% $
+% \begin{array}{c}\downarrow\\
+%     \hat\beta_5\\
+%     \swarrow~~
+% \end{array}
+% $
 
-\begin{center}
-\includegraphics[width=2.25in]{graphs/boothist}
-\end{center}
+% \begin{center}
+% \includegraphics[width=2.25in]{graphs/boothist}
+% \end{center}
  
 
-\vskip -.5cm
-\end{frame}
+% \vskip -.5cm
+% \end{frame}
 
-\begin{frame}
-
-
-{\bf \theme The Bootstrap:} resample your data {\it with replacement} \\
-~~~~~~~~~~~~~~~~~~ and calculate  some statistic of interest.  
-
-\vskip .1cm {\it \gr With-Replacement: each draw is put back in the `bucket', so it is possible to sample the same
-observation multiple times.  }
-
-\vskip .5cm
-To raise oneself up by bootstraps...  
-{\gr (Try it; it doesn't work).}
-
-\vskip .05cm    The metaphor refers
-to surprising examples of self sufficiency.
-
-\vskip .5cm
-For $b=1\ldots B$ `bootstrap samples'
-\begin{itemize}\nv
-\item Resample {\theme with replacement} $n$ observations.
-\item Calculate your estimate (e.g., $\hat\beta_b$).
-\end{itemize}
-
-\vskip .5cm
-This is an {\it approximation} to the sampling distribution.
-
-\vskip .1cm
-For example, an approx SE($\hat\beta$) is
-$\mr{sd}(\hat\beta) =\sqrt{\frac{1}{B}
-\sum_b (\hat \beta_b - \bar{\beta})^2}.
-$
-
-\end{frame}
+% \begin{frame}
 
 
-\begin{frame}
+% {\bf \theme The Bootstrap:} resample your data {\it with replacement} \\
+% ~~~~~~~~~~~~~~~~~~ and calculate  some statistic of interest.  
 
-{\bf \theme The Bootstrap: \bk why it works}
+% \vskip .1cm {\it \gr With-Replacement: each draw is put back in the `bucket', so it is possible to sample the same
+% observation multiple times.  }
 
-\begin{center}
-\includegraphics[width=2in]{graphs/bs_bighist}
+% \vskip .5cm
+% To raise oneself up by bootstraps...  
+% {\gr (Try it; it doesn't work).}
 
-{\gr data sample}
+% \vskip .05cm    The metaphor refers
+% to surprising examples of self sufficiency.
 
-$\swarrow~~~\downarrow~~~\searrow$
+% \vskip .5cm
+% For $b=1\ldots B$ `bootstrap samples'
+% \begin{itemize}\nv
+% \item Resample {\theme with replacement} $n$ observations.
+% \item Calculate your estimate (e.g., $\hat\beta_b$).
+% \end{itemize}
 
-\includegraphics[width=4.25in]{graphs/bs_boothist}
+% \vskip .5cm
+% This is an {\it approximation} to the sampling distribution.
 
-\gr bootstrap samples
-\end{center}
+% \vskip .1cm
+% For example, an approx SE($\hat\beta$) is
+% $\mr{sd}(\hat\beta) =\sqrt{\frac{1}{B}
+% \sum_b (\hat \beta_b - \bar{\beta})^2}.
+% $
 
-You are pretending that the {\it empirical data distribution} is
-the population, and using it to draw alternative samples.
-\end{frame}
+% \end{frame}
+
+
+% \begin{frame}
+
+% {\bf \theme The Bootstrap: \bk why it works}
+
+% \begin{center}
+% \includegraphics[width=2in]{graphs/bs_bighist}
+
+% {\gr data sample}
+
+% $\swarrow~~~\downarrow~~~\searrow$
+
+% \includegraphics[width=4.25in]{graphs/bs_boothist}
+
+% \gr bootstrap samples
+% \end{center}
+
+% You are pretending that the {\it empirical data distribution} is
+% the population, and using it to draw alternative samples.
+% \end{frame}
 
 
 
-\begin{frame}
+% \begin{frame}
 
-{\bf The {\nv Bayesian} Bootstrap}
+% {\bf The {\nv Bayesian} Bootstrap}
 
-\begin{center}
-\includegraphics[width=\textwidth]{graphs/bayesbootprior}
+% \begin{center}
+% \includegraphics[width=\textwidth]{graphs/bayesbootprior}
 
-{\gr prior samples}
+% {\gr prior samples}
 
-$\downarrow~~~~\downarrow~~~~\downarrow$
+% $\downarrow~~~~\downarrow~~~~\downarrow$
 
-\includegraphics[width=\textwidth]{graphs/bayesbootpost}
+% \includegraphics[width=\textwidth]{graphs/bayesbootpost}
 
-\gr posterior samples
-\end{center}
+% \gr posterior samples
+% \end{center}
 
-You have a nonparametric model over {\it all} possible observations, but then
-use a convenient prior that limits you to observed support.
+% You have a nonparametric model over {\it all} possible observations, but then
+% use a convenient prior that limits you to observed support.
 
-\vskip .5cm
-It'll work whenever the standard Bootstrap works: only if the empirical data distribution 
-is a decent substitute for the population.
+% \vskip .5cm
+% It'll work whenever the standard Bootstrap works: only if the empirical data distribution 
+% is a decent substitute for the population.
 
-\end{frame}
+% \end{frame}
 
 % z <- x <- c()
 % dz <- dx <- c()
@@ -398,34 +398,34 @@ where $\bs{\Theta} = \mr{diag}(\bs{\theta})$.
 \includegraphics[width=\textwidth]{graphs/ozone}
 \end{frame}
 
-\begin{frame}[fragile]
+% \begin{frame}[fragile]
 
-{\footnotesize\gr
-\begin{verbatim}
-data(airquality); n <- nrow(airquality)
-B <- 1000; beta <- vector(length=B)
-for(b in 1:B){
-  fit <- lm(Ozone ~., data=airquality, weights=rexp(n))
-  beta[b] <- coef(fit)["Wind"] }
-sampfit <- lm(Ozone ~ ., data=airquality)
-coef <- summary(sampfit)$coef["Wind",1:2]
-x <- as.matrix(cbind(1,na.omit(airquality)[,-1]))
-xxi <- solve(crossprod(x))
-sandwich <- xxi%*%t(x)%*%diag(sampfit$resid^2)%*%x%*%xxi
-hist(beta, col=8, main="", 
-  xlab="Coefficient for Ozone on Wind", 
-  freq=FALSE,ylim=c(0,0.6),breaks=25)
-grid <- seq(-6,5,length=500)
-lines(grid, dnorm(grid,coef[1],coef[2]),col=2,lwd=2)
-lines(grid, dnorm(grid,coef[1],sqrt(sandwich[3,3])),col=4,lwd=2)
-legend("topleft",col=c(8,2),lwd=4, 
-  legend=c("bootstrap BNP posterior",
-           "normal approx BNP posterior",
-           "standard sampling distribution"),bty="n")
-\end{verbatim}
-}
+% {\footnotesize\gr
+% \begin{verbatim}
+% data(airquality); n <- nrow(airquality)
+% B <- 1000; beta <- vector(length=B)
+% for(b in 1:B){
+%   fit <- lm(Ozone ~., data=airquality, weights=rexp(n))
+%   beta[b] <- coef(fit)["Wind"] }
+% sampfit <- lm(Ozone ~ ., data=airquality)
+% coef <- summary(sampfit)$coef["Wind",1:2]
+% x <- as.matrix(cbind(1,na.omit(airquality)[,-1]))
+% xxi <- solve(crossprod(x))
+% sandwich <- xxi%*%t(x)%*%diag(sampfit$resid^2)%*%x%*%xxi
+% hist(beta, col=8, main="", 
+%   xlab="Coefficient for Ozone on Wind", 
+%   freq=FALSE,ylim=c(0,0.6),breaks=25)
+% grid <- seq(-6,5,length=500)
+% lines(grid, dnorm(grid,coef[1],coef[2]),col=2,lwd=2)
+% lines(grid, dnorm(grid,coef[1],sqrt(sandwich[3,3])),col=4,lwd=2)
+% legend("topleft",col=c(8,2),lwd=4, 
+%   legend=c("bootstrap BNP posterior",
+%            "normal approx BNP posterior",
+%            "standard sampling distribution"),bty="n")
+% \end{verbatim}
+% }
 
-\end{frame}
+% \end{frame}
 
 
 
@@ -521,7 +521,7 @@ $i$ if $d_i = d$.
 \vskip .25cm
 We'd love to model $\ds{E}[\upsilon_{i}(1)- \upsilon_{i}(0) | \bm{x}_i]$, but we can't directly.  
 
-\vskip .25cm
+\vskip .5cm
 Since $d \indep [\bm{x},\bs{\upsilon}]$, a good alternative is to consider 
 \[
 \ds{E}[\upsilon_{i}(1)|d_i=1,\bm{x}_i] - \ds{E}[\upsilon_{i}(0) |d_i=0,\bm{x}_i].
@@ -532,15 +532,15 @@ Even simpler, just diff the OLS projections for each group
  (\bm{X}_{\sf c}'\bs{\Theta}_{\sf c}\bm{X}_{\sf c})^{-1}  \bm{X}_{\sf c}'\bs{\Theta}_{\sf c}\bm{y}_{\sf c}
 \]
 
-{\gr \small See Taddy, Gardner, Chen, Draper 2014 for alternative linear projections.}
+%{\gr \small See Taddy, Gardner, Chen, Draper 2014 for alternative linear projections.}
 
 \end{frame}
 
 \begin{frame}
 
-Since $\bs{\beta}_{\sf t} \indep \bs{\beta}_{\sf c}$, our results on BNP analysis of OLS apply directly.  Or you can bootstrap, but it takes a long time.
+% Since $\bs{\beta}_{\sf t} \indep \bs{\beta}_{\sf c}$, our results on BNP analysis of OLS apply directly.  Or you can bootstrap, but it takes a long time.
 
-\vskip .25cm
+% \vskip .25cm
 e.g., coefficient on {\it [made purchase this year]} vs an intercept:
 
 \vskip .25cm
@@ -558,9 +558,9 @@ e.g., coefficient on {\it [made purchase this year]} vs an intercept:
 
 \begin{frame}
 
-$\bs{\beta}_{\sf t} - \bs{\beta}_{\sf c}$ is a statistic we care about, even if the truth is nonlinear.
+%$\bs{\beta}_{\sf t} - \bs{\beta}_{\sf c}$ is a statistic we care about, even if the truth is nonlinear.
 
-\vskip .25cm 
+%\vskip .25cm 
 The most basic application of an A/B experiment is estimating the average treatment effect,
 \[
 \text{ATE} = \ds{E}[\upsilon({\sf t})] -
@@ -572,7 +572,7 @@ But many authors  advocate instead the `regression adjusted' $\bm{\bar x}'(\bs{\
 \vskip .25cm
 Both are [frequentist] unbiased. 
 
-\vskip .25cm
+\vskip .5cm
  But quantifying uncertainty about the regression adjustment, and any variance reduction it provides, is tough without assumptions.  
 
 \end{frame}
@@ -756,27 +756,27 @@ This defeats the whole purpose of trees: these are rules that are designed to gr
 
 \end{frame}
 
-\begin{frame}
-\begin{adjustwidth}{-.5in}{}
-\vskip -.6in
-\includegraphics[width=6in]{graphs/broadband}
-\end{adjustwidth}
+% \begin{frame}
+% \begin{adjustwidth}{-.5in}{}
+% \vskip -.6in
+% \includegraphics[width=6in]{graphs/broadband}
+% \end{adjustwidth}
 
-\vskip .6cm
+% \vskip .6cm
 
-{ \bf Data Distribution and Big Data}
+% { \bf Data Distribution and Big Data}
 
-\vskip .5cm
-{\nv Distributed}: independent computations on many datasets.\\
+% \vskip .5cm
+% {\nv Distributed}: independent computations on many datasets.\\
 
-\vskip .1cm
-For truly {\nv Big Data} we need distributed algorithms.
+% \vskip .1cm
+% For truly {\nv Big Data} we need distributed algorithms.
 
-\vskip .5cm
-The trick is to find strategies for distribution so that local-machine calculations are as relevant as possible to the global inference question:
-only data that needs to be together is together.
+% \vskip .5cm
+% The trick is to find strategies for distribution so that local-machine calculations are as relevant as possible to the global inference question:
+% only data that needs to be together is together.
 
-\end{frame}
+% \end{frame}
 
 
 
@@ -958,31 +958,32 @@ This works because
 %q \upsilon_i(1)\frac{1 - q}{q(1-q)} - (1-q) \upsilon_i(0)\frac{q}{q(1-q)}
 \upsilon_i(1)- \upsilon_i(0).
 \]
-{\gr Recall: $\upsilon_i(d)$ is the potential outcome for user $i$ if $d_i = d$.}
+% {\gr Recall: $\upsilon_i(d)$ is the potential outcome for user $i$ if $d_i = d$.}
 
+How sure are we of the fitted tree?  {\nv Bayes forest is a posterior.}
 \end{frame}
 
-\begin{frame}
+% \begin{frame}
 
-A\texttt{+}I use Cross Validation to prune a single CART tree.
+% A\texttt{+}I use Cross Validation to prune a single CART tree.
 
-\vskip .1cm
-But: CV can perform poorly for selection of {\it unstable} models.
+% \vskip .1cm
+% But: CV can perform poorly for selection of {\it unstable} models.
 
-\vskip .1cm
-{\gr 
-Breiman 1996 is the classic paper on this and it's the motivation behind Random Forests in Breiman 2001: averaging beats pruning.}
+% \vskip .1cm
+% {\gr 
+% Breiman 1996 is the classic paper on this and it's the motivation behind Random Forests in Breiman 2001: averaging beats pruning.}
 
 
-\vskip .5cm
-How good are the trees in this case?
+% \vskip .5cm
+% How good are the trees in this case?
 
-\vskip .1cm
-We can apply the Bayesian bootstrap (i.e., fit a BF) to assess {\it posterior uncertainty} about the selected treatment-effect trees.
+% \vskip .1cm
+% We can apply the Bayesian bootstrap (i.e., fit a BF) to assess {\it posterior uncertainty} about the selected treatment-effect trees.
 
-\vskip .5cm
-{\gr\small (BTW if you don't need a single tree, a better solution might be to just partition by predicted treatment effect from the forest, say $>$ or $<$ zero.)}
-\end{frame}
+% \vskip .5cm
+% {\gr\small (BTW if you don't need a single tree, a better solution might be to just partition by predicted treatment effect from the forest, say $>$ or $<$ zero.)}
+% \end{frame}
 
 \begin{frame}
 
@@ -1024,7 +1025,7 @@ This proximity matrix maps from from the full sample \\to each observation's pre
 The average proximity between observations at each node measures how well a given tree is replicating this  structure.
 
 \end{frame}
-
+ 
 \begin{frame}
 
 
@@ -1050,6 +1051,80 @@ Again: after 5 weeks the tree is much more stable.
 \left[\tfrac{1}{3},\tfrac{1}{2}\right)$}, {\color{DarkRed}  $\mr{p}
 \in \left[\tfrac{1}{2},\tfrac{3}{4}\right]$}, and {\color{Blue} $\mr{p}
 \geq \tfrac{3}{4}$}.
+
+\end{frame}
+
+\begin{frame}
+
+{\bf Heavy tails and semiparametric extensions}
+
+\vskip .5cm
+In some settings we have really heavy tailed data.
+
+\vskip .25cm
+\includegraphics[width=\textwidth]{graphs/gt2k_proportion.pdf}
+
+\vskip .25cm
+The standard bootstrap fails for infinite variance distributions.  
+
+\vskip .25cm
+We should suspect our Bayesian bootstrap will have similarly bad frequentist properties.  {\gr e.g., the posterior will not be consistent.}
+\end{frame}
+
+\begin{frame}
+
+{\bf Semi-parametrics: only model where you really need it.}
+
+\vskip .5cm
+We can replace our DGP with a model that includes a parametric tail above some threshold $u$:
+\[
+\mr{p}(z ) = \frac{1}{|\bs{\theta}|}
+\sum_{l=1}^L \theta_l \ds{1}{[z =
+\zeta_l]} + \frac{\theta_{L+1}}{|\bs{\theta}|} \theme \mathrm{GPD}(z-u;~\xi,~\sigma)\ds{1}{[z \geq u]}
+\]
+where $\mathrm{GPD}(\cdot;~\xi,~\sigma)$ is the generalized Pareto density function 
+\[
+\mathrm{p}(y) = \frac{1}{\sigma}\left( 1 + \xi \frac{y}{\sigma}\right)^{-(\frac{1}{\xi} + 1)}
+\]
+with $\xi>0$  the tail index and $\sigma>0$  the scale.  
+
+\end{frame}
+
+\begin{frame}
+
+{\bf Semi-parametrics in treatment effect estimation}
+
+\vskip .5cm
+Say $\lambda = \ds{E}[z|z\geq u]$.
+
+\vskip .25cm
+Given treatment and control samples and the above SPB model, we can derive the mean and variance of $\gamma = \mu_1 - \mu_0$ up to $\ds{E}[\lambda_1 - \lambda_0]$ and $\mr{var}(\lambda_1 - \lambda_0)$.
+
+\vskip .25cm
+So we need MCMC, but just on the little bit of data in the tail.  
+
+\vskip .1cm
+{\gr And we have a new super simple Independence MH algorithm that proposes from a parametric bootstrap.}
+
+\end{frame}
+
+\begin{frame}
+
+The I-MH algorithm takes a parametric bootstrap for the MAP of [$\xi,\sigma$], then estimates the density of this `proposal' with a kernel smoother and uses this to calculate acceptance probabilities.
+
+\vskip .5cm
+\includegraphics[width=1.62\textwidth]{graphs/tail-tid33203-cut2000}
+
+\end{frame}
+
+\begin{frame}
+
+And we can use resulting posterior on $\gamma = \mu_1 - \mu_0$ to evaluate the accuracy of other common inference techniques.  
+
+\vskip .5cm
+For example, naive inference just looks at $\bar y_1 - \bar y_2$, while `capping' or winsorization replaces all values above a cap with that threshold.
+
+\includegraphics[width=\textwidth]{graphs/winsorized-cut2000-tid33203}
 
 \end{frame}
 
