@@ -4,7 +4,7 @@
 
 % replaces beamer foot with simple page number
 \setbeamertemplate{navigation symbols}{}
-%\setbeamerfont{frametitle}{series=\bfseries}
+\setbeamerfont{frametitle}{series=\bfseries,size=\normalsize}
 \setbeamercolor{frametitle}{fg=Black}
 
 \setbeamertemplate{footline}{
@@ -16,7 +16,7 @@
 % colors
 \newcommand{\theme}{\color{Maroon}}
 \newcommand{\bk}{\color{black}}
-\newcommand{\rd}{\color{DarkRed}}
+\newcommand{\rd}{\color{red}}
 \newcommand{\fg}{\color{ForestGreen}}
 \newcommand{\bl}{\color{blue}}
 \newcommand{\gr}{\color{black!50}}
@@ -177,7 +177,6 @@ We complete specification with a conjugate prior on the weights:
 
 %\vskip .25cm
 This is the Dirichlet-multinomial sampling model {\gr (Ferguson 1973)}.  
-
 
 \end{frame}
 
@@ -1005,53 +1004,7 @@ After 5 weeks the tree is much more stable.
 \includegraphics[width=.9\textwidth]{graphs/samptree_week5}
 \end{center}
 
-\end{frame}
-
-\begin{frame}
-
-We can quantify uncertainty about all sorts of structure.
-
-\vskip .5cm
-A Bayesian Forest implies a {\theme proximity matrix}:
-
-\vskip .1cm
-~~~~ $n \times n$ with $i,j$ element  the proportion of trees \\
-~~~~ that have observations $i$ and $j$ in the same leaf.
-
-\vskip .1cm
-This proximity matrix maps from from the full sample \\to each observation's predicted value from the full tree.
-
-\vskip .5cm
-The average proximity between observations at each node measures how well a given tree is replicating this  structure.
-
-\end{frame}
- 
-\begin{frame}
-
-
-e.g., Pruned CART with after one week:
-\begin{center}
-\includegraphics[width=.54\textwidth]{graphs/samptree_proxyatleaf_week1}
-\end{center}
-\hfill Average proxy: {\color{black!50} $\mr{p} <\tfrac{1}{3}$},
-{\color{black!75}  $\mr{p} \in
-\left[\tfrac{1}{3},\tfrac{1}{2}\right)$}, {\color{DarkRed}  $\mr{p}
-\in \left[\tfrac{1}{2},\tfrac{3}{4}\right]$}, and {\color{Blue} $\mr{p}
-\geq \tfrac{3}{4}$}.
-\end{frame}
-
-\begin{frame}
-
-Again: after 5 weeks the tree is much more stable.
-\begin{center}
-\includegraphics[width=.9\textwidth]{graphs/samptree_proxyatleaf_week5}
-\end{center}
-\hfill Average proxy: {\color{black!50} $\mr{p} <\tfrac{1}{3}$},
-{\color{black!75}  $\mr{p} \in
-\left[\tfrac{1}{3},\tfrac{1}{2}\right)$}, {\color{DarkRed}  $\mr{p}
-\in \left[\tfrac{1}{2},\tfrac{3}{4}\right]$}, and {\color{Blue} $\mr{p}
-\geq \tfrac{3}{4}$}.
-
+\hfill But you should still use a forest below a certain point.
 \end{frame}
 
 \begin{frame}
@@ -1091,41 +1044,98 @@ with $\xi>0$  the tail index and $\sigma>0$  the scale.
 \end{frame}
 
 \begin{frame}
+{Inference for tail parameters}
 
-{\bf Semi-parametrics in treatment effect estimation}
-
-\vskip .5cm
-Say $\lambda = \ds{E}[z|z\geq u]$.
-
-\vskip .25cm
-Given treatment and control samples and the above SPB model, we can derive the mean and variance of $\gamma = \mu_1 - \mu_0$ up to $\ds{E}[\lambda_1 - \lambda_0]$ and $\mr{var}(\lambda_1 - \lambda_0)$.
+Everything for the weights is as before 
+{\gr (exponential posterior)}.
 
 \vskip .25cm
-So we need MCMC, but just on the little bit of data in the tail.  
+For the GPD tail parameters, we use the prior
+\begin{equation*}\label{eq:gpdrefprior}
+\pi(\sigma,\xi) = \frac{1}{\sigma}\xi^{a-1}(1-\xi)^{b-1}\mathds{1}_{\xi \in (0,1)},
+\end{equation*}
+
+For noninformative inference, use $a=b=1$.  But it is cooler to use a bank of related `background' tail transactions to estimate $\hat\alpha,\hat \beta$.
+
+
+\vskip .25cm
+We have a super simple independence MH posterior sampler \\that is based upon re-sampling from a parametric bootstrap.
 
 \vskip .1cm
-{\gr And we have a new super simple Independence MH algorithm that proposes from a parametric bootstrap.}
+Or, you can use a laplace approximation.
 
 \end{frame}
 
 \begin{frame}
 
-The I-MH algorithm takes a parametric bootstrap for the MAP of [$\xi,\sigma$], then estimates the density of this `proposal' with a kernel smoother and uses this to calculate acceptance probabilities.
+Inference for the mean exeedance $\lambda = \sigma/(1-\xi)$, \\beyond $u=\$9000$, in one of our treatment groups.
 
-\vskip .5cm
-\includegraphics[width=1.62\textwidth]{graphs/tail-tid33203-cut2000}
+\begin{center}
+{\footnotesize ~~~$a=1,~ b=1$~~~~~~~~~~~~~$a=9,~ b=9$~~~~~~~~~~~$a=80,~ b=80$}
+\includegraphics[width=.34\textwidth]{graphs/tail33203-u9000-a1-b1.pdf}\!\!\!\!\!\!\!
+\includegraphics[width=.34\textwidth]{graphs/tail33203-u9000-a9-b9.pdf}\!\!\!\!\!\!\!
+\includegraphics[width=.34\textwidth]{graphs/tail33203-u9000-a80-b80.pdf}
+\end{center}
+
+These results can be used for inference about the overall mean, via
+{\small $\ds{E}\mu = \tfrac{1}{m+n}\sum_{i=1}^m z_i + \frac{n}{m+n}(u +
+\ds{E}\lambda)$ \&
+$
+\mr{var} \mu = \ds{E}[\mr{var}(\mu|\lambda)] + \mr{var}(\ds{E}[\mu|\lambda]).
+$}
 
 \end{frame}
 
 \begin{frame}
 
-And we can use resulting posterior on $\gamma = \mu_1 - \mu_0$ to evaluate the accuracy of other common inference techniques.  
+
+Average  performance over 20 resamples
+of $N=5000$ from each of 25 treatment group samples, containing
+1-3$\times10^5$ observations. 
+
+\begin{center}
+\includegraphics[width=.85\textwidth]{graphs/performance.pdf}
+\end{center}
+
+We make gains of up to 50\% in RMSE relative to $\bar z$, and also have better coverage than either $\mr{sd}(z)/\sqrt{n}$ or the $\frac{n}{2}$-of-$n$ bootstrap.
+\vskip -.5cm
+\end{frame}
+
+\begin{frame}
+
+{\bf Choosing the threshold}
 
 \vskip .5cm
-For example, naive inference just looks at $\bar y_1 - \bar y_2$, while `capping' or winsorization replaces all values above a cap with that threshold.
+We show consistency for the analogous \textit{frequentist semiparametric bootstrap} (explains our nice coverage) when 
+$u_N = O(N^{\xi/(1+2\delta\xi)})$.
 
-\includegraphics[width=\textwidth]{graphs/winsorized-cut2000-tid33203}
+\vskip .5cm
+In this limit, $\sigma_N = \xi u_N$.  So, one can increase $u$ until this  holds. {\gr Indeed, it  holds roughly in our examples for good performing $u$.}
 
+\vskip  .5cm
+But in finite sample practice, it seems wise to try a few $u$ \\and use one in the range where inference is stable.
+
+\end{frame}
+
+\begin{frame}
+{Semi-parametrics in treatment effect estimation}
+
+
+Semiparametric inference makes a big difference in A/B analysis.\\
+ Looking at ATEs, $\mu_1 - \mu_2$, in a few example experiments:
+
+\vskip .25cm
+\hfill {\footnotesize {\bl sp-bayes}, {\bk capped}, {\rd naive}}
+\begin{center}\vskip -.5cm
+\!\!\includegraphics[width=.34\textwidth]{graphs/AB-tid33203.pdf}\!\!\!
+\includegraphics[width=.34\textwidth]{graphs/AB-tid32099.pdf}\!\!\!
+%\includegraphics[width=.25\textwidth]{graphs/AB-tid32350.pdf}\!\!
+\includegraphics[width=.34\textwidth]{graphs/AB-tid33444.pdf}\!\!\!
+\end{center}
+
+\vskip -.25cm
+Such care in uncertainty quantification is essential whenever you need to understand the full posterior (or sampling) distribution. {\gr e.g., bandit learning with heavy-tailed rewards is another application.\!\!\!}
+\vskip -.25cm
 \end{frame}
 
 \begin{frame}
