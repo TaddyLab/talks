@@ -40,23 +40,23 @@
 \begin{document}
 
 \setcounter{page}{0}
-{ \usebackgroundtemplate{\includegraphics[height=\paperheight]{phoenix}}
 \begin{frame}[plain]
 \begin{center}
 
-{\bf \LARGE \theme }
+{\bf \LARGE \theme  Big Data + Bayesian Nonparametrics}
 
-{\bf \Large  Big Data and Bayesian Nonparametrics}
-
-\vskip 2cm
-Matt Taddy,  Chicago Booth
-
+\vskip 1cm \Large
+{\bf Matt Taddy}
 
 \vskip .25cm
+Microsoft Research and University of Chicago
+
+
+\vskip .25cm\large
 {\texttt{faculty.chicagobooth.edu/matt.taddy/research}}
 
 \end{center}
-\end{frame} }
+\end{frame} 
 
 
 \begin{frame}
@@ -1030,19 +1030,24 @@ Variable average effects for three important user features.
 
 \begin{frame}
 
-{\bf Heavy tails and semiparametric extensions}
+{\bf Scalable semiparametrics for heavy-tailed distributions}
 
 \vskip .5cm
 In some settings we have really heavy tailed data.
 
 \vskip .25cm
-\includegraphics[width=\textwidth]{graphs/gt2k_proportion.pdf}
+\includegraphics[width=.9\textwidth]{graphs/gt2k_proportion.pdf}
 
 \vskip .25cm
 The standard bootstrap fails for infinite variance distributions.  
 
 \vskip .25cm
-We should suspect our Bayesian bootstrap will have similarly bad frequentist properties.  {\gr e.g., the posterior will not be consistent.}
+We should suspect our Bayesian bootstrap will have similarly bad frequentist properties.  {\color{Maroon} e.g., the posterior will not be consistent.}
+\end{frame}
+
+\begin{frame}
+\includegraphics[width=.95\textwidth]{graphs/spikes.PNG}\\ \hfill
+So the distribution below the tail is also screwy.
 \end{frame}
 
 \begin{frame}
@@ -1062,6 +1067,11 @@ where $\mathrm{GPD}(\cdot;~\xi,~\sigma)$ is the generalized Pareto density funct
 \]
 with $\xi>0$  the tail index and $\sigma>0$  the scale.  
 
+\vskip .5cm
+Say $\mu = \ds{E}[z]$ and $\lambda = \ds{E}[z-u|z\geq u]$. 
+
+\vskip .1cm
+ $\ds{E}[\mu]$ and $\mr{var}(\mu)$ are available in closed form up-to $\ds{E}[\lambda]$ and $\mr{var}[\lambda]$.
 \end{frame}
 
 \begin{frame}
@@ -1076,7 +1086,7 @@ For the GPD tail parameters, we use the prior
 \pi(\sigma,\xi) = \frac{1}{\sigma}\xi^{a-1}(1-\xi)^{b-1}\mathds{1}_{\xi \in (0,1)},
 \end{equation*}
 
-For noninformative inference, use $a=b=1$.  But it is cooler to use a bank of related `background' tail transactions to estimate $\hat\alpha,\hat \beta$.
+For noninformative inference, use $a=b=1$.  But it is cooler to use a bank of related `background' tail transactions to estimate $\hat\alpha,\hat \beta$. 
 
 
 \vskip .25cm
@@ -1085,6 +1095,33 @@ We have a super simple independence MH posterior sampler \\that is based upon re
 \vskip .1cm
 Or, you can use a laplace approximation.
 
+\end{frame}
+
+\begin{frame}
+
+{\bf Bootstrap-based posterior sampling} 
+
+
+
+\begin{itemize}
+\item Fit the MAP parameter estimates $[\hat\xi,\hat\sigma]$.
+\item Obtain $B$ draws $[\hat\xi_b,\hat\sigma_b]$ from the parametric bootstrap:
+\begin{itemize}
+\item Generate a sample of size $n$  from the MAP GPD model.
+\item Obtain new MAP estimates $[\hat\xi_b,\hat\sigma_b]$ for  this simulated sample.
+\end{itemize}
+\item Get a kernel estimate, say $r(\xi,\sigma)$, for the bootstrap density.
+\item Replace each $[\hat\xi_b,\hat\sigma_b]$ with $[\hat\xi_{b-1},\hat\sigma_{b-1}]$ with probability 
+\[
+1 - \mr{min}\left\{ 
+\frac{r(\hat\xi_{b-1},\hat\sigma_{b-1})\exp[l(\hat\xi_b, \hat\sigma_b)]}
+{r(\hat\xi_{b},\hat\sigma_{b})\exp[l(\hat\xi_{b-1}, \hat\sigma_{b-1})]}, ~1\right\}.
+\]
+\end{itemize}
+
+\vskip .5cm
+{\color{Maroon}
+Super fast to run and code.  And it relates Bayes to Frequentism!}
 \end{frame}
 
 \begin{frame}
@@ -1098,43 +1135,40 @@ Inference for the mean exeedance $\lambda = \sigma/(1-\xi)$, \\beyond $u=\$9000$
 \includegraphics[width=.34\textwidth]{graphs/tail33203-u9000-a80-b80.pdf}
 \end{center}
 
-These results can be used for inference about the overall mean, via
-{\small $\ds{E}\mu = \tfrac{1}{m+n}\sum_{i=1}^m z_i + \frac{n}{m+n}(u +
-\ds{E}\lambda)$ \&
-$
-\mr{var} \mu = \ds{E}[\mr{var}(\mu|\lambda)] + \mr{var}(\ds{E}[\mu|\lambda]).
-$}
+These results give all we need for  inference about the overall mean.
 
 \end{frame}
 
 \begin{frame}
 
 
-Average  performance over 20 resamples
-of $N=5000$ from each of 25 treatment group samples, containing
-1-3$\times10^5$ observations. 
+Performance over 100 resamples
+of $N=50,000$ from $10^7$ total. 
 
 \begin{center}
-\includegraphics[width=.85\textwidth]{graphs/performance.pdf}
+\includegraphics[width=.85\textwidth]{graphs/performance-tid33146-50000.pdf}\\
+{\scriptsize
+\bf ~~~~~{\color{DarkBlue} -- Bayes a,b=1} \hspace{.5cm} {\color{DodgerBlue} -- Bayes a,b=9} \hspace{.5cm}{\color{LimeGreen} -- Bayes a,b=80} \\{\color{Pink} -- Winsorization} \hspace{.3cm}{\color{red} --  FW tilting} \hspace{.3cm} {\color{black!70} -- sample mean} \hspace{.3cm} {\color{Gold} -- N/2 subsampling} }
 \end{center}
 
-We make gains of up to 50\% in RMSE relative to $\bar z$, and also have better coverage than either $\mr{sd}(z)/\sqrt{n}$ or the $\frac{n}{2}$-of-$n$ bootstrap.
+% Lowest-possible RMSE + accurate frequentist coverage,
+% and fast!
 \vskip -.5cm
 \end{frame}
 
 \begin{frame}
+{\bf Consistency and thresholds}
 
-{\bf Choosing the threshold}
-
-\vskip .5cm
-We show consistency for the analogous \textit{frequentist semiparametric bootstrap} (explains our nice coverage) when 
-$u_N = O(N^{\xi/(1+2\delta\xi)})$.
+The \textit{semiparametric bootstrap}  is consistent if 
+$u_N = O(N^{\xi/(1+2\delta\xi)})$. \\ {\gr Which is cool, because the nonparametric bootstrap is not.}
 
 \vskip .5cm
-In this limit, $\sigma_N = \xi u_N$.  So, one can increase $u$ until this  holds. {\gr Indeed, it  holds roughly in our examples for good performing $u$.}
+In this limit, $\sigma_N = \xi u_N$.  So, one can increase $u$ until this  holds. { Indeed, it  holds roughly in our examples for good performing $u$.}
 
 \vskip  .5cm
-But in finite sample practice, it seems wise to try a few $u$ \\and use one in the range where inference is stable.
+In practice, {\theme results are robust to a range of tail thresholds}. 
+
+\vskip .5cm {This also suggests why informative priors on $\sigma$ are not useful:\\~~ it is already informed by both the threshold and the tail index.}
 
 \end{frame}
 
@@ -1147,11 +1181,8 @@ Semiparametric inference makes a big difference in A/B analysis.\\
 
 \vskip .25cm
 \hfill {\footnotesize {\bl sp-bayes}, {\bk capped}, {\rd naive}}
-\begin{center}\vskip -.5cm
-\!\!\includegraphics[width=.34\textwidth]{graphs/AB-tid33203.pdf}\!\!\!
-\includegraphics[width=.34\textwidth]{graphs/AB-tid32099.pdf}\!\!\!
-%\includegraphics[width=.25\textwidth]{graphs/AB-tid32350.pdf}\!\!
-\includegraphics[width=.34\textwidth]{graphs/AB-tid33444.pdf}\!\!\!
+\begin{center}
+\includegraphics[width=\textwidth]{graphs/ABtrials}
 \end{center}
 
 \vskip -.25cm
